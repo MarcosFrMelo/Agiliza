@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Excluir Projeto{% endblock %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card border-danger shadow">
+                <div class="card-header bg-danger text-white">
+                    <h4 class="mb-0">Excluir Projeto</h4>
+                </div>
+                <div class="card-body text-center">
+                    <h5 class="card-title mt-3">Tem certeza?</h5>
+                    <p class="card-text lead">Você está prestes a excluir o projeto: <strong>{{ object.nome }}</strong></p>
+                    
+                    <div class="alert alert-warning">
+                        <i class="fa-solid fa-triangle-exclamation"></i>
+                        Atenção: Todas as tarefas associadas a este projeto também serão apagadas permanentemente.
+                    </div>
+                    
+                    <form action="" method="POST">
+                        {% csrf_token %}
+                        <div class="mt-4">
+                            <a href="{% url 'projeto:listar' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <button type="submit" class="btn btn-danger">Sim, Excluir Definitivamente</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

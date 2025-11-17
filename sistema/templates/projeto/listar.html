@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}Meus Projetos{% endblock %}
+
+{% block conteudo %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>Meus Projetos</h3>
+        <a href="{% url 'projeto:novo' %}" class="btn btn-primary">
+            <i class="fa-solid fa-plus"></i> Novo Projeto
+        </a>
+    </div>
+    <hr>
+
+    <div class="row">
+        {% for projeto in projetos %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                {% if projeto.imagem_capa %}
+                    <img src="{{ projeto.imagem_capa.url }}" class="card-img-top" alt="{{ projeto.nome }}" style="height: 150px; object-fit: cover;">
+                {% else %}
+                    <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 150px;">
+                        <span style="font-size: 3rem;">📁</span>
+                    </div>
+                {% endif %}
+                
+                <div class="card-body">
+                    <h5 class="card-title">{{ projeto.nome }}</h5>
+                    <p class="card-text text-muted">{{ projeto.descricao|default:"Sem descrição"|truncatechars:60 }}</p>
+                </div>
+                
+                <div class="card-footer bg-white d-flex justify-content-between align-items-center">
+                    <div class="btn-group">
+                        <a href="{% url 'projeto:editar' projeto.pk %}" class="btn btn-outline-warning btn-sm" title="Editar">
+                            Editar
+                        </a>
+                        <a href="{% url 'projeto:deletar' projeto.pk %}" class="btn btn-outline-danger btn-sm" title="Excluir">
+                            Excluir
+                        </a>
+                    </div>
+                    <button class="btn btn-primary btn-sm" disabled title="Em breve">Abrir Quadro</button>
+                </div>
+            </div>
+        </div>
+        {% empty %}
+        <div class="col-12 text-center mt-5">
+            <div class="alert alert-light" role="alert">
+                <h4 class="alert-heading">Nenhum projeto encontrado!</h4>
+                <p>Comece criando seu primeiro projeto para organizar suas tarefas.</p>
+                <hr>
+                <a href="{% url 'projeto:novo' %}" class="btn btn-success">Criar Primeiro Projeto</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

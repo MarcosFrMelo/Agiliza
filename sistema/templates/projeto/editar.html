@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Editar Projeto{% endblock %}
+
+{% block conteudo %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow">
+                <div class="card-header bg-warning text-dark">
+                    <h4 class="mb-0">Editar: {{ object.nome }}</h4>
+                </div>
+                <div class="card-body">
+                    <form action="" method="POST" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        {{ form.as_p }}
+
+                        {% if object.imagem_capa %}
+                            <div class="mb-3">
+                                <p class="text-muted small">Imagem atual:</p>
+                                <img src="{{ object.imagem_capa.url }}" alt="Capa atual" style="max-height: 100px; border-radius: 5px;">
+                            </div>
+                        {% endif %}
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                            <a href="{% url 'projeto:listar' %}" class="btn btn-secondary me-md-2">Cancelar</a>
+                            <button type="submit" class="btn btn-success">Salvar Alterações</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

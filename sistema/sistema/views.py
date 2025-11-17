@@ -1,9 +1,11 @@
 from django.contrib.auth import authenticate, login, logout
-from django.views.generic import View
+from django.views.generic import View, CreateView
 from django.shortcuts import render, redirect
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
+from django.contrib.auth.forms import UserCreationForm
+from django.urls import reverse_lazy
 
 class Login(View):
     """
@@ -51,3 +53,11 @@ class LoginAPI(ObtainAuthToken):
             'email': user.email,
             'token': token.key
         })
+    
+class Registrar(CreateView):
+    """
+    View para cadastro de novos usuários.
+    """
+    template_name = 'registro.html'
+    form_class = UserCreationForm
+    success_url = reverse_lazy('login')
