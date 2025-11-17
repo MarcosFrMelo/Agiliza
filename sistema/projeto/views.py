@@ -3,6 +3,9 @@ from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Projeto
 from .forms import ProjetoForm
+from django.core.exceptions import ObjectDoesNotExist
+from django.http import FileResponse, Http404
+from django.views.generic import View
 
 class ProjetoListar(LoginRequiredMixin, ListView):
     model = Projeto
@@ -38,3 +41,16 @@ class ProjetoDeletar(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return Projeto.objects.filter(dono=self.request.user)
+    
+class FotoProjeto(View):
+    """
+    View para exibir a foto de um projeto.
+    """
+    def get(self, request, arquivo):
+        try:
+            projeto = Projeto.objects.get(imagem_capa='projeto/fotos/{}'.format(arquivo))
+            return FileResponse(projeto.foto)
+        except ObjectDoesNotExist:
+            raise Http404("Foto do Veículo não encontrado")
+        except Exception as e:
+            raise e

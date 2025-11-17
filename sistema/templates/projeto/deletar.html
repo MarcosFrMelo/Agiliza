@@ -22,7 +22,7 @@
                     <form action="" method="POST">
                         {% csrf_token %}
                         <div class="mt-4">
-                            <a href="{% url 'projeto:listar' %}" class="btn btn-secondary me-2">Cancelar</a>
+                            <a href="{% url 'listar-projetos' %}" class="btn btn-secondary me-2">Cancelar</a>
                             <button type="submit" class="btn btn-danger">Sim, Excluir Definitivamente</button>
                         </div>
                     </form>
