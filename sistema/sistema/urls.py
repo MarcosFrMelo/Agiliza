@@ -12,5 +12,3 @@ urlpatterns = [
     path('logout/', Logout.as_view(), name='logout'),
     path('autenticacao-api/', LoginAPI.as_view(), name='autenticacao-api'),
 ]
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
