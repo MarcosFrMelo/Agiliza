@@ -1,11 +1,11 @@
-from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView, View, DetailView
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Projeto
 from .forms import ProjetoForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse, Http404
-from django.views.generic import View
+from tarefa.models import Tarefa
 
 class ProjetoListar(LoginRequiredMixin, ListView):
     model = Projeto
@@ -54,3 +54,20 @@ class FotoProjeto(View):
             raise Http404("Foto do Veículo não encontrado")
         except Exception as e:
             raise e
+        
+class ProjetoQuadro(LoginRequiredMixin, DetailView):
+    """
+    Exibe o quadro Kanban com as tarefas separadas por colunas
+    """
+    model = Projeto
+    template_name = 'projeto/quadro.html'
+    context_object_name = 'projeto'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        tarefas = self.object.tarefas.all()
+        context['a_fazer'] = tarefas.filter(status=1)
+        context['fazendo'] = tarefas.filter(status=2)
+        context['feito'] = tarefas.filter(status=3)
+        
+        return context

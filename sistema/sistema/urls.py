@@ -9,6 +9,7 @@ urlpatterns = [
     path('', Login.as_view(), name='login'),
     path('registrar/', Registrar.as_view(), name='registrar'),
     path('projeto/', include('projeto.urls'), name='projeto'),
+    path('tarefa/', include('tarefa.urls'), name='tarefa'),
     path('logout/', Logout.as_view(), name='logout'),
     path('autenticacao-api/', LoginAPI.as_view(), name='autenticacao-api'),
 ]
