@@ -18,7 +18,7 @@
         <div class="col-md-4 mb-4">
             <div class="card h-100 shadow-sm">
                 {% if projeto.imagem_capa %}
-                    <img src="{{ projeto.foto.url }}" class="card-img-top" alt="{{ projeto.nome }}" style="height: 150px; object-fit: cover;">
+                    <img src="{{ projeto.imagem_capa.url }}" class="card-img-top" alt="{{ projeto.nome }}" style="height: 150px; object-fit: cover;">
                 {% else %}
                     <div class="card-img-top bg-secondary d-flex align-items-center justify-content-center text-white" style="height: 150px;">
                         <span style="font-size: 3rem;">📁</span>

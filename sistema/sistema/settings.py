@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'projeto.apps.ProjetoConfig',
+    'tarefa.apps.TarefaConfig',
     'corsheaders',
     'rest_framework',
     'rest_framework.authtoken'

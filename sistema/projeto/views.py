@@ -49,7 +49,7 @@ class FotoProjeto(View):
     def get(self, request, arquivo):
         try:
             projeto = Projeto.objects.get(imagem_capa='projeto/fotos/{}'.format(arquivo))
-            return FileResponse(projeto.foto)
+            return FileResponse(projeto.imagem_capa)
         except ObjectDoesNotExist:
             raise Http404("Foto do Veículo não encontrado")
         except Exception as e:
