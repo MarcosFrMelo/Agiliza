@@ -1,0 +1,104 @@
+{% extends 'base.html' %}
+
+{% block titulo %}Quadro: {{ projeto.nome }}{% endblock %}
+
+{% block conteudo %}
+<div class="container-fluid mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h3>
+            {% if projeto.imagem_capa %}
+                <img src="{{ projeto.imagem_capa.url }}" alt="" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover;" class="me-2">
+            {% endif %}
+            {{ projeto.nome }}
+        </h3>
+        <div>
+            <a href="{% url 'nova-tarefa' projeto.id %}" class="btn btn-primary">
+                <i class="fa-solid fa-plus"></i> Nova Tarefa
+            </a>
+            <a href="{% url 'listar-projetos' %}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </div>
+
+    <div class="row">
+        
+        <div class="col-md-4">
+            <div class="card bg-light h-100 border-0 shadow-sm">
+                <div class="card-header bg-danger text-white fw-bold text-center">A FAZER</div>
+                <div class="card-body p-2" style="background-color: #f8f9fa;">
+                    {% for tarefa in a_fazer %}
+                        <div class="card mb-2 shadow-sm border-start border-4 border-danger">
+                            <div class="card-body p-3">
+                                <h6 class="card-title mb-1 fw-bold">{{ tarefa.titulo }}</h6>
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary">{{ tarefa.get_etiqueta_display }}</span>
+                                </div>
+                                <p class="card-text small text-muted mb-2">{{ tarefa.descricao|truncatechars:40 }}</p>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <a href="{% url 'editar-tarefa' tarefa.pk %}" class="btn btn-sm btn-outline-warning me-1" title="Editar"><i class="fa-solid fa-pen"></i></a>
+                                    <a href="{% url 'deletar-tarefa' tarefa.pk %}" class="btn btn-sm btn-outline-danger" title="Excluir"><i class="fa-solid fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center small mt-3">Nenhuma tarefa.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light h-100 border-0 shadow-sm">
+                <div class="card-header bg-warning text-dark fw-bold text-center">FAZENDO</div>
+                <div class="card-body p-2" style="background-color: #fff3cd40;">
+                    {% for tarefa in fazendo %}
+                        <div class="card mb-2 shadow-sm border-start border-4 border-warning">
+                            <div class="card-body p-3">
+                                <h6 class="card-title mb-1 fw-bold">{{ tarefa.titulo }}</h6>
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary">{{ tarefa.get_etiqueta_display }}</span>
+                                </div>
+                                <p class="card-text small text-muted mb-2">{{ tarefa.descricao|truncatechars:40 }}</p>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <a href="{% url 'editar-tarefa' tarefa.pk %}" class="btn btn-sm btn-outline-warning me-1"><i class="fa-solid fa-pen"></i></a>
+                                    <a href="{% url 'deletar-tarefa' tarefa.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center small mt-3">Nada em andamento.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4">
+            <div class="card bg-light h-100 border-0 shadow-sm">
+                <div class="card-header bg-success text-white fw-bold text-center">FEITO</div>
+                <div class="card-body p-2" style="background-color: #d1e7dd40;">
+                    {% for tarefa in feito %}
+                        <div class="card mb-2 shadow-sm border-start border-4 border-success">
+                            <div class="card-body p-3">
+                                <h6 class="card-title mb-1 fw-bold">{{ tarefa.titulo }}</h6>
+                                <div class="mb-2">
+                                    <span class="badge bg-secondary">{{ tarefa.get_etiqueta_display }}</span>
+                                </div>
+                                <p class="card-text small text-muted mb-2">{{ tarefa.descricao|truncatechars:40 }}</p>
+                                
+                                <div class="d-flex justify-content-end">
+                                    <a href="{% url 'editar-tarefa' tarefa.pk %}" class="btn btn-sm btn-outline-warning me-1"><i class="fa-solid fa-pen"></i></a>
+                                    <a href="{% url 'deletar-tarefa' tarefa.pk %}" class="btn btn-sm btn-outline-danger"><i class="fa-solid fa-trash"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                        {% empty %}
+                        <p class="text-muted text-center small mt-3">Nada concluído.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
