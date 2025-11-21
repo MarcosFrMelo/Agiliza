@@ -6,6 +6,10 @@ from .forms import ProjetoForm
 from django.core.exceptions import ObjectDoesNotExist
 from django.http import FileResponse, Http404
 from tarefa.models import Tarefa
+from rest_framework.generics import ListAPIView, CreateAPIView, DestroyAPIView, UpdateAPIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from .serializers import ProjetoSerializer
 
 class ProjetoListar(LoginRequiredMixin, ListView):
     model = Projeto
@@ -71,3 +75,35 @@ class ProjetoQuadro(LoginRequiredMixin, DetailView):
         context['feito'] = tarefas.filter(status=3)
         
         return context
+    
+class APIListarProjetos(ListAPIView):
+    serializer_class = ProjetoSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Projeto.objects.filter(dono=self.request.user)
+
+class APICriarProjeto(CreateAPIView):
+    serializer_class = ProjetoSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def perform_create(self, serializer):
+        serializer.save(dono=self.request.user)
+
+class APIEditarProjeto(UpdateAPIView):
+    serializer_class = ProjetoSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Projeto.objects.filter(dono=self.request.user)
+
+class APIExcluirProjeto(DestroyAPIView):
+    serializer_class = ProjetoSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Projeto.objects.filter(dono=self.request.user)

@@ -1,0 +1,43 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Agiliza Mobile</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <div class="ion-text-center ion-margin-top ion-margin-bottom">
+    <ion-icon name="person-circle-outline" style="font-size: 80px; color: #3880ff;"></ion-icon>
+    <h2>Bem-vindo</h2>
+    <p>Faça login para continuar</p>
+  </div>
+
+  <ion-card>
+    <ion-card-header>
+      <ion-card-title>Login</ion-card-title>
+    </ion-card-header>
+
+    <ion-card-content>
+      <ion-item class="ion-margin-bottom">
+        <ion-label position="stacked">Usuário</ion-label>
+        <ion-input type="text" [(ngModel)]="instancia.username" placeholder="Seu usuário"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-bottom">
+        <ion-label position="stacked">Senha</ion-label>
+        <ion-input type="password" [(ngModel)]="instancia.password" placeholder="Sua senha"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" (click)="autenticarUsuario()" class="ion-margin-top">
+        ENTRAR
+      </ion-button>
+
+      <div class="ion-text-center ion-margin-top">
+        <ion-button fill="clear" routerLink="/register" size="small">
+          Não tem conta? Cadastre-se
+        </ion-button>
+      </div>
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>

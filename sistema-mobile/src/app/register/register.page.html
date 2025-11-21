@@ -1,0 +1,42 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/login"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Criar Conta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+
+  <div class="ion-text-center ion-margin-top">
+    <ion-icon name="create-outline" style="font-size: 60px; color: #2dd36f;"></ion-icon>
+    <p>Preencha os dados abaixo</p>
+  </div>
+
+  <ion-card>
+    <ion-card-content>
+      
+      <ion-item class="ion-margin-bottom">
+        <ion-label position="stacked">Nome de Usuário</ion-label>
+        <ion-input type="text" [(ngModel)]="usuario.username"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-bottom">
+        <ion-label position="stacked">Email</ion-label>
+        <ion-input type="email" [(ngModel)]="usuario.email"></ion-input>
+      </ion-item>
+
+      <ion-item class="ion-margin-bottom">
+        <ion-label position="stacked">Senha</ion-label>
+        <ion-input type="password" [(ngModel)]="usuario.password"></ion-input>
+      </ion-item>
+
+      <ion-button expand="block" color="success" (click)="registrarUsuario()" class="ion-margin-top">
+        CADASTRAR
+      </ion-button>
+
+    </ion-card-content>
+  </ion-card>
+
+</ion-content>
