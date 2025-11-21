@@ -54,10 +54,3 @@ class LoginAPI(ObtainAuthToken):
             'token': token.key
         })
     
-class Registrar(CreateView):
-    """
-    View para cadastro de novos usuários.
-    """
-    template_name = 'registro.html'
-    form_class = UserCreationForm
-    success_url = reverse_lazy('login')
