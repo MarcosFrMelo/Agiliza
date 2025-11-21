@@ -80,4 +80,10 @@ export class ProjetosPage implements OnInit {
     });
     mensagem.present();
   }
+  
+  handleRefresh(event: any) {
+    this.consultarProjetos().then(() => {
+      event.target.complete();
+    });
+  }
 }
