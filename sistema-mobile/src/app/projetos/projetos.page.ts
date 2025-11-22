@@ -33,7 +33,7 @@ export class ProjetosPage {
   ) {
     addIcons({ add, pencilOutline, trashOutline, folderOpenOutline, logOutOutline });
   }
-
+  
   async ionViewWillEnter() {
     await this.storage.create();
     const registro = await this.storage.get('usuario');
@@ -47,6 +47,9 @@ export class ProjetosPage {
   }
 
   async consultarProjetos() {
+    const loading = await this.controle_carregamento.create({ message: 'Carregando...', duration: 5000 });
+    await loading.present();
+
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',
@@ -56,16 +59,22 @@ export class ProjetosPage {
     };
 
     CapacitorHttp.get(options)
-      .then((resposta: HttpResponse) => {
+      .then(async (resposta: HttpResponse) => {
+        loading.dismiss();
         this.ngZone.run(() => {
           if (resposta.status == 200) {
             this.lista_projetos = resposta.data;
           } else {
-            if (resposta.status == 401) this.logout();
+            if (resposta.status == 401) {
+              this.logout();
+            } else {
+              this.apresenta_mensagem(`Erro ao listar: ${resposta.status}`);
+            }
           }
         });
       })
-      .catch((erro: any) => {
+      .catch(async (erro: any) => {
+        loading.dismiss();
         console.error(erro);
       });
   }
@@ -81,7 +90,7 @@ export class ProjetosPage {
   async confirmarExclusao(id: number) {
     const alert = await this.controle_alerta.create({
       header: 'Tem certeza?',
-      message: 'Deseja excluir este projeto?',
+      message: 'Deseja realmente excluir este projeto?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
@@ -107,20 +116,21 @@ export class ProjetosPage {
     };
 
     CapacitorHttp.delete(options)
-      .then((resposta: HttpResponse) => {
+      .then(async (resposta: HttpResponse) => {
         loading.dismiss();
+        
         this.ngZone.run(() => {
           if (resposta.status == 204 || resposta.status == 200) {
             this.apresenta_mensagem('Projeto excluído!');
             this.lista_projetos = this.lista_projetos.filter(p => p.id !== id);
           } else {
-            this.apresenta_mensagem('Erro ao excluir.');
+            this.apresenta_mensagem(`Erro ao excluir: ${resposta.status}`);
           }
         });
       })
-      .catch(() => {
+      .catch(async () => {
         loading.dismiss();
-        this.apresenta_mensagem('Erro de conexão.');
+        this.apresenta_mensagem('Erro ao tentar excluir.');
       });
   }
 
