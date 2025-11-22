@@ -1,0 +1,32 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/projetos"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ titulo }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list>
+    
+    <ion-item class="ion-margin-bottom">
+      <ion-label position="stacked">Nome do Projeto</ion-label>
+      <ion-input [(ngModel)]="projeto.nome" placeholder="Ex: TCC"></ion-input>
+    </ion-item>
+
+    <ion-item class="ion-margin-bottom">
+      <ion-label position="stacked">Descrição</ion-label>
+      <ion-textarea [(ngModel)]="projeto.descricao" rows="4" placeholder="Detalhes do projeto..."></ion-textarea>
+    </ion-item>
+
+  </ion-list>
+
+  <ion-button expand="block" (click)="salvar()" class="ion-margin-top">
+    {{ botaoTexto }}
+  </ion-button>
+  
+  <ion-button expand="block" fill="clear" (click)="cancelar()" color="medium">
+    Cancelar
+  </ion-button>
+</ion-content>
