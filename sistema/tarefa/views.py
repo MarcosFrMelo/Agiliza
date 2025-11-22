@@ -5,6 +5,10 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Tarefa
 from .forms import TarefaForm
 from projeto.models import Projeto
+from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.permissions import IsAuthenticated
+from .serializers import TarefaSerializer
 
 class TarefaNova(LoginRequiredMixin, CreateView):
     model = Tarefa
@@ -38,3 +42,32 @@ class TarefaDeletar(LoginRequiredMixin, DeleteView):
     
     def get_success_url(self):
         return reverse_lazy('quadro-projeto', kwargs={'pk': self.object.projeto.id})
+    
+class APIListarTarefas(ListAPIView):
+    serializer_class = TarefaSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Tarefa.objects.filter(projeto__dono=self.request.user)
+
+class APICriarTarefa(CreateAPIView):
+    serializer_class = TarefaSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+class APIEditarTarefa(UpdateAPIView):
+    serializer_class = TarefaSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Tarefa.objects.filter(projeto__dono=self.request.user)
+
+class APIExcluirTarefa(DestroyAPIView):
+    serializer_class = TarefaSerializer
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return Tarefa.objects.filter(projeto__dono=self.request.user)

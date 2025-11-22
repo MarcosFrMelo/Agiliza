@@ -33,7 +33,7 @@ export class ProjetosPage {
   ) {
     addIcons({ add, pencilOutline, trashOutline, folderOpenOutline, logOutOutline });
   }
-  
+
   async ionViewWillEnter() {
     await this.storage.create();
     const registro = await this.storage.get('usuario');
@@ -120,7 +120,7 @@ export class ProjetosPage {
         loading.dismiss();
         
         this.ngZone.run(() => {
-          if (resposta.status == 204 || resposta.status == 200) {
+          if (resposta.status == 204) {
             this.apresenta_mensagem('Projeto excluído!');
             this.lista_projetos = this.lista_projetos.filter(p => p.id !== id);
           } else {
