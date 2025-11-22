@@ -33,7 +33,22 @@ export class ProjetoCadastroPage implements OnInit {
     public loadingCtrl: LoadingController,
     public storage: Storage,
     private router: Router
-  ) { }
+  ) { 
+    const nav = this.router.getCurrentNavigation();
+    if (nav && nav.extras && nav.extras.state) {
+      const dadosRecebidos = nav.extras.state['projeto'];
+      
+      if (dadosRecebidos) {
+        this.projeto = { 
+          id: dadosRecebidos.id,
+          nome: dadosRecebidos.nome,
+          descricao: dadosRecebidos.descricao
+        };
+        this.titulo = 'Editar Projeto';
+        this.botaoTexto = 'Salvar Alterações';
+      }
+    }
+  }
 
   async ngOnInit() {
     await this.storage.create();
@@ -41,18 +56,15 @@ export class ProjetoCadastroPage implements OnInit {
     if (registro) {
       this.usuario = Object.assign(new Usuario(), registro);
     }
+  }
 
-    const state = this.router.getCurrentNavigation()?.extras.state;
-    if (state && state['projeto']) {
-      this.projeto = { ...state['projeto'] };
-      this.titulo = 'Editar Projeto';
-      this.botaoTexto = 'Salvar';
-    }
+  onFileSelected(event: any) {
+    console.log("Arquivo selecionado:", event.target.files[0]);
   }
 
   async salvar() {
     if (!this.projeto.nome) {
-      this.mostrarToast('Preencha o nome do projeto!');
+      this.mostrarToast('O nome é obrigatório!');
       return;
     }
 
@@ -73,7 +85,10 @@ export class ProjetoCadastroPage implements OnInit {
         'Authorization': `Token ${this.usuario.token}`
       },
       url: 'http://127.0.0.1:8000/projeto/api/cadastrar/',
-      data: this.projeto
+      data: {
+        nome: this.projeto.nome,
+        descricao: this.projeto.descricao
+      }
     };
 
     CapacitorHttp.post(options)
@@ -83,7 +98,7 @@ export class ProjetoCadastroPage implements OnInit {
           this.mostrarToast('Projeto criado com sucesso!');
           this.navCtrl.back();
         } else {
-          this.mostrarToast('Erro ao criar projeto.');
+          this.mostrarToast('Erro ao criar: ' + res.status);
         }
       })
       .catch((err) => {
@@ -103,7 +118,10 @@ export class ProjetoCadastroPage implements OnInit {
         'Authorization': `Token ${this.usuario.token}`
       },
       url: `http://127.0.0.1:8000/projeto/api/editar/${this.projeto.id}/`,
-      data: this.projeto
+      data: {
+        nome: this.projeto.nome,
+        descricao: this.projeto.descricao
+      }
     };
 
     CapacitorHttp.put(options)
@@ -113,11 +131,12 @@ export class ProjetoCadastroPage implements OnInit {
           this.mostrarToast('Projeto atualizado!');
           this.navCtrl.back();
         } else {
-          this.mostrarToast('Erro ao atualizar.');
+          this.mostrarToast('Erro ao atualizar: ' + res.status);
         }
       })
       .catch((err) => {
         loading.dismiss();
+        console.error(err);
         this.mostrarToast('Erro de conexão.');
       });
   }

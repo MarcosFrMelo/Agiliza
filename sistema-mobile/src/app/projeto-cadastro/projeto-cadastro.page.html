@@ -20,9 +20,14 @@
       <ion-textarea [(ngModel)]="projeto.descricao" rows="4" placeholder="Detalhes do projeto..."></ion-textarea>
     </ion-item>
 
+    <ion-item class="ion-margin-bottom">
+      <ion-label position="stacked">Imagem da Capa</ion-label>
+      <input type="file" (change)="onFileSelected($event)" style="margin-top: 10px;" />
+    </ion-item>
+
   </ion-list>
 
-  <ion-button expand="block" (click)="salvar()" class="ion-margin-top">
+  <ion-button expand="block" (click)="salvar()" class="ion-margin-top" color="primary">
     {{ botaoTexto }}
   </ion-button>
   
