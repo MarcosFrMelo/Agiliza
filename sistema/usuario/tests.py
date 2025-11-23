@@ -15,12 +15,13 @@ class TestesViewRegistrar(TestCase):
         self.assertIsInstance(response.context['form'], UserCreationForm)
 
     def test_registro_usuario_sucesso(self):
+        """Testa criar um usuário com o formulário padrão"""
         data = {
             'username': 'novousuario',
-            'password1': 'password123',
-            'password2': 'password123'
+            'password1': 'Teste@123456', 
+            'password2': 'Teste@123456'
         }
-
+        
         response = self.client.post(self.url, data)
 
         self.assertEqual(response.status_code, 302)
@@ -31,10 +32,10 @@ class TestesViewRegistrar(TestCase):
     def test_registro_senhas_diferentes(self):
         data = {
             'username': 'usuarioerro',
-            'password': 'password123',
-            'pass2': 'senhaerrada'
+            'password1': 'Teste@123456',
+            'password2': 'SenhaErrada@000'
         }
         response = self.client.post(self.url, data)
-
+        
         self.assertEqual(response.status_code, 200)
         self.assertFalse(User.objects.filter(username='usuarioerro').exists())

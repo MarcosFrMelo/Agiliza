@@ -14,7 +14,7 @@ class Login(View):
     def get(self, request):
         contexto = {}
         if request.user.is_authenticated:
-            return redirect("/projeto")
+            return redirect("/projeto/")
         
         return render(request, 'autenticacao.html', contexto)
 
@@ -26,7 +26,7 @@ class Login(View):
         if user is not None:
             login(request, user)
 
-            return redirect("/projeto")
+            return redirect("/projeto/")
         return render(request, 'autenticacao.html', {"error": "Usuário ou senha inválidos!"})
     
 class Logout(View):
