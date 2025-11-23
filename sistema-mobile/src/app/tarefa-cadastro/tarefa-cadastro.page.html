@@ -21,26 +21,20 @@
     </ion-item>
 
     <ion-item>
-      <ion-select label="Projeto" label-placement="floating" [(ngModel)]="tarefa.projeto" placeholder="Selecione o projeto">
-        <ion-select-option *ngFor="let proj of lista_projetos" [value]="proj.id">
-          {{ proj.nome }}
-        </ion-select-option>
-      </ion-select>
-    </ion-item>
-
-    <ion-item>
       <ion-select label="Status" label-placement="floating" [(ngModel)]="tarefa.status">
         <ion-select-option [value]="1">A Fazer</ion-select-option>
         <ion-select-option [value]="2">Fazendo</ion-select-option>
-        <ion-select-option [value]="3">Concluído</ion-select-option>
+        <ion-select-option [value]="3">Feito</ion-select-option>
       </ion-select>
     </ion-item>
 
     <ion-item>
       <ion-select label="Prioridade" label-placement="floating" [(ngModel)]="tarefa.etiqueta">
-        <ion-select-option [value]="1">Alta</ion-select-option>
-        <ion-select-option [value]="2">Média</ion-select-option>
-        <ion-select-option [value]="3">Baixa</ion-select-option>
+        <ion-select-option [value]="1">Urgente</ion-select-option>
+        <ion-select-option [value]="2">Importante</ion-select-option>
+        <ion-select-option [value]="3">Normal</ion-select-option>
+        <ion-select-option [value]="4">Baixa Prioridade</ion-select-option>
+        <ion-select-option [value]="5">Opcional</ion-select-option>
       </ion-select>
     </ion-item>
 
