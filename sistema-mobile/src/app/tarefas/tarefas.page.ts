@@ -21,6 +21,7 @@ export class TarefasPage {
 
   public usuario: Usuario = new Usuario();
   public lista_tarefas: any[] = [];
+  
   public projetoIdFiltro: number | null = null;
   public nomeProjetoFiltro: string = '';
 
@@ -55,11 +56,7 @@ export class TarefasPage {
   }
 
   async consultarTarefas() {
-    const loading = await this.controle_carregamento.create({ message: 'Carregando...', duration: 5000 });
-    await loading.present();
-
     let urlApi = 'http://127.0.0.1:8000/tarefa/api/listar/';
-    
     if (this.projetoIdFiltro) {
       urlApi += `?projeto_id=${this.projetoIdFiltro}`;
     }
@@ -72,21 +69,24 @@ export class TarefasPage {
       url: urlApi
     };
 
-    CapacitorHttp.get(options)
-      .then(async (resposta: HttpResponse) => {
-        loading.dismiss();
-        this.ngZone.run(() => {
-          if (resposta.status == 200) {
-            this.lista_tarefas = resposta.data;
-          } else {
-            this.apresenta_mensagem(`Erro ao listar: ${resposta.status}`);
-          }
-        });
-      })
-      .catch(async (erro: any) => {
-        loading.dismiss();
-        console.error(erro);
+    try {
+      const resposta = await CapacitorHttp.get(options);
+      this.ngZone.run(() => {
+        if (resposta.status == 200) {
+          this.lista_tarefas = resposta.data;
+        } else {
+          this.apresenta_mensagem(`Erro ao listar: ${resposta.status}`);
+        }
       });
+    } catch (erro) {
+      console.error(erro);
+    }
+  }
+
+  handleRefresh(event: any) {
+    this.consultarTarefas().then(() => {
+      event.target.complete();
+    });
   }
 
   novaTarefa() {
