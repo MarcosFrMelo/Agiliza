@@ -1,0 +1,45 @@
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary">
+    <ion-title>Minhas Tarefas</ion-title>
+    <ion-buttons slot="end">
+      <ion-back-button defaultHref="/home"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <ion-list>
+    <ion-item-sliding *ngFor="let tarefa of lista_tarefas">
+      <ion-item lines="full">
+        <ion-label>
+          <h2>{{ tarefa.titulo }}</h2>
+          <p>
+            <ion-text color="medium">{{ tarefa.projeto_nome }}</ion-text> | 
+            <ion-text [color]="tarefa.status == 3 ? 'success' : 'warning'">{{ tarefa.status_display }}</ion-text>
+          </p>
+          <p>Prioridade: {{ tarefa.etiqueta_display }}</p>
+        </ion-label>
+        <ion-note slot="end" style="font-size: 0.8rem;">
+          {{ tarefa.data_criacao | date:'dd/MM' }}
+        </ion-note>
+      </ion-item>
+
+      <ion-item-options side="end">
+        <ion-item-option color="primary" (click)="editar(tarefa)">
+          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
+        </ion-item-option>
+        <ion-item-option color="danger" (click)="confirmarExclusao(tarefa.id)">
+          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
+        </ion-item-option>
+      </ion-item-options>
+    </ion-item-sliding>
+  </ion-list>
+
+  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
+    <ion-fab-button (click)="novaTarefa()" color="tertiary">
+      <ion-icon name="add"></ion-icon>
+    </ion-fab-button>
+  </ion-fab>
+
+</ion-content>

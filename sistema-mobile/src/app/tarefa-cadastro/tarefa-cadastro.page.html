@@ -1,0 +1,54 @@
+<ion-header>
+  <ion-toolbar color="primary">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/tarefas"></ion-back-button>
+    </ion-buttons>
+    <ion-title>{{ editando ? 'Editar Tarefa' : 'Nova Tarefa' }}</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="ion-padding">
+  <ion-list lines="full">
+    
+    <ion-item>
+      <ion-label position="floating">Título</ion-label>
+      <ion-input [(ngModel)]="tarefa.titulo" type="text"></ion-input>
+    </ion-item>
+
+    <ion-item>
+      <ion-label position="floating">Descrição</ion-label>
+      <ion-textarea [(ngModel)]="tarefa.descricao" rows="3"></ion-textarea>
+    </ion-item>
+
+    <ion-item>
+      <ion-select label="Projeto" label-placement="floating" [(ngModel)]="tarefa.projeto" placeholder="Selecione o projeto">
+        <ion-select-option *ngFor="let proj of lista_projetos" [value]="proj.id">
+          {{ proj.nome }}
+        </ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-select label="Status" label-placement="floating" [(ngModel)]="tarefa.status">
+        <ion-select-option [value]="1">A Fazer</ion-select-option>
+        <ion-select-option [value]="2">Fazendo</ion-select-option>
+        <ion-select-option [value]="3">Concluído</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+    <ion-item>
+      <ion-select label="Prioridade" label-placement="floating" [(ngModel)]="tarefa.etiqueta">
+        <ion-select-option [value]="1">Alta</ion-select-option>
+        <ion-select-option [value]="2">Média</ion-select-option>
+        <ion-select-option [value]="3">Baixa</ion-select-option>
+      </ion-select>
+    </ion-item>
+
+  </ion-list>
+
+  <div class="ion-padding">
+    <ion-button expand="block" (click)="salvar()" color="primary">
+      Salvar Tarefa
+    </ion-button>
+  </div>
+</ion-content>

@@ -2,16 +2,19 @@ from rest_framework import serializers
 from .models import Tarefa
 
 class TarefaSerializer(serializers.ModelSerializer):
-    status_display = serializers.CharField(source='get_status_display', read_only=True)
-    etiqueta_display = serializers.CharField(source='get_etiqueta_display', read_only=True)
-    projeto_nome = serializers.CharField(source='projeto.nome', read_only=True)
+    status_display = serializers.SerializerMethodField()
+    etiqueta_display = serializers.SerializerMethodField()
+    projeto_nome = serializers.SerializerMethodField()
 
     class Meta:
         model = Tarefa
-        fields = [
-            'id', 'titulo', 'descricao', 
-            'status', 'status_display', 
-            'etiqueta', 'etiqueta_display', 
-            'projeto', 'projeto_nome',
-            'data_criacao'
-        ]
+        exclude = [] 
+
+    def get_status_display(self, instancia):
+        return instancia.get_status_display()
+
+    def get_etiqueta_display(self, instancia):
+        return instancia.get_etiqueta_display()
+
+    def get_projeto_nome(self, instancia):
+        return instancia.projeto.nome if instancia.projeto else None

@@ -6,21 +6,23 @@ import { Storage } from '@ionic/storage-angular';
 import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
 import { Usuario } from '../login/usuario.model';
 import { addIcons } from 'ionicons';
-import { add, pencilOutline, trashOutline, folderOpenOutline, logOutOutline } from 'ionicons/icons';
+import { add, pencilOutline, trashOutline, checkmarkCircleOutline, alertCircleOutline } from 'ionicons/icons';
 import { Router } from '@angular/router';
 
 @Component({
-  selector: 'app-projetos',
-  templateUrl: './projetos.page.html',
-  styleUrls: ['./projetos.page.scss'],
+  selector: 'app-tarefas',
+  templateUrl: './tarefas.page.html',
+  styleUrls: ['./tarefas.page.scss'],
   standalone: true,
   imports: [IonicModule, CommonModule, FormsModule],
   providers: [Storage]
 })
-export class ProjetosPage {
+export class TarefasPage {
 
   public usuario: Usuario = new Usuario();
-  public lista_projetos: any[] = [];
+  public lista_tarefas: any[] = [];
+  public projetoIdFiltro: number | null = null;
+  public nomeProjetoFiltro: string = '';
 
   constructor(
     public storage: Storage,
@@ -31,7 +33,13 @@ export class ProjetosPage {
     private router: Router,
     private ngZone: NgZone
   ) {
-    addIcons({ add, pencilOutline, trashOutline, folderOpenOutline, logOutOutline });
+    addIcons({ add, pencilOutline, trashOutline, checkmarkCircleOutline, alertCircleOutline });
+
+    const nav = this.router.getCurrentNavigation();
+    if (nav?.extras?.state) {
+      this.projetoIdFiltro = nav.extras.state['projeto_id'];
+      this.nomeProjetoFiltro = nav.extras.state['projeto_nome'];
+    }
   }
 
   async ionViewWillEnter() {
@@ -40,22 +48,28 @@ export class ProjetosPage {
 
     if (registro) {
       this.usuario = Object.assign(new Usuario(), registro);
-      this.consultarProjetos(); 
+      this.consultarTarefas(); 
     } else {
       this.controle_navegacao.navigateRoot('/login');
     }
   }
 
-  async consultarProjetos() {
+  async consultarTarefas() {
     const loading = await this.controle_carregamento.create({ message: 'Carregando...', duration: 5000 });
     await loading.present();
+
+    let urlApi = 'http://127.0.0.1:8000/tarefa/api/listar/';
+    
+    if (this.projetoIdFiltro) {
+      urlApi += `?projeto_id=${this.projetoIdFiltro}`;
+    }
 
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',
         'Authorization': `Token ${this.usuario.token}`
       },
-      url: 'http://127.0.0.1:8000/projeto/api/listar/'
+      url: urlApi
     };
 
     CapacitorHttp.get(options)
@@ -63,13 +77,9 @@ export class ProjetosPage {
         loading.dismiss();
         this.ngZone.run(() => {
           if (resposta.status == 200) {
-            this.lista_projetos = resposta.data;
+            this.lista_tarefas = resposta.data;
           } else {
-            if (resposta.status == 401) {
-              this.logout();
-            } else {
-              this.apresenta_mensagem(`Erro ao listar: ${resposta.status}`);
-            }
+            this.apresenta_mensagem(`Erro ao listar: ${resposta.status}`);
           }
         });
       })
@@ -78,41 +88,34 @@ export class ProjetosPage {
         console.error(erro);
       });
   }
-  
-  abrirTarefas(projeto: any) {
-    this.router.navigate(['/tarefas'], { 
-      state: { 
-        projeto_id: projeto.id, 
-        projeto_nome: projeto.nome 
-      } 
+
+  novaTarefa() {
+    this.router.navigate(['/tarefa-cadastro'], { 
+      state: { projeto_pre_selecionado: this.projetoIdFiltro } 
     });
   }
 
-  novoProjeto() {
-    this.controle_navegacao.navigateForward('/projeto-cadastro');
-  }
-
-  editar(projeto: any) {
-    this.router.navigate(['/projeto-cadastro'], { state: { projeto: projeto } });
+  editar(tarefa: any) {
+    this.router.navigate(['/tarefa-cadastro'], { state: { tarefa: tarefa } });
   }
 
   async confirmarExclusao(id: number) {
     const alert = await this.controle_alerta.create({
       header: 'Tem certeza?',
-      message: 'Deseja realmente excluir este projeto?',
+      message: 'Deseja excluir esta tarefa?',
       buttons: [
         { text: 'Cancelar', role: 'cancel' },
         {
           text: 'Excluir',
           role: 'confirm',
-          handler: () => { this.excluirProjeto(id); }
+          handler: () => { this.excluirTarefa(id); }
         }
       ]
     });
     await alert.present();
   }
 
-  async excluirProjeto(id: number) {
+  async excluirTarefa(id: number) {
     const loading = await this.controle_carregamento.create({ message: 'Excluindo...' });
     await loading.present();
 
@@ -121,17 +124,16 @@ export class ProjetosPage {
         'Content-Type': 'application/json',
         'Authorization': `Token ${this.usuario.token}`
       },
-      url: `http://127.0.0.1:8000/projeto/api/deletar/${id}/`
+      url: `http://127.0.0.1:8000/tarefa/api/deletar/${id}/`
     };
 
     CapacitorHttp.delete(options)
       .then(async (resposta: HttpResponse) => {
         loading.dismiss();
-        
         this.ngZone.run(() => {
           if (resposta.status == 204) {
-            this.apresenta_mensagem('Projeto excluído!');
-            this.lista_projetos = this.lista_projetos.filter(p => p.id !== id);
+            this.apresenta_mensagem('Tarefa excluída!');
+            this.consultarTarefas(); 
           } else {
             this.apresenta_mensagem(`Erro ao excluir: ${resposta.status}`);
           }
@@ -143,20 +145,11 @@ export class ProjetosPage {
       });
   }
 
-  async logout() {
-    await this.storage.remove('usuario');
-    this.controle_navegacao.navigateRoot('/home');
-  }
-
   async apresenta_mensagem(texto: string) {
     const mensagem = await this.controle_toast.create({
       message: texto,
       duration: 2000
     });
     mensagem.present();
-  }
-
-  handleRefresh(event: any) {
-    this.consultarProjetos().then(() => event.target.complete());
   }
 }

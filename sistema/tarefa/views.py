@@ -49,7 +49,11 @@ class APIListarTarefas(ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        return Tarefa.objects.filter(projeto__dono=self.request.user)
+        queryset = Tarefa.objects.filter(projeto__dono=self.request.user)
+        projeto_id = self.request.query_params.get('projeto_id')
+        if projeto_id:
+            queryset = queryset.filter(projeto_id=projeto_id)
+        return queryset
 
 class APICriarTarefa(CreateAPIView):
     serializer_class = TarefaSerializer
