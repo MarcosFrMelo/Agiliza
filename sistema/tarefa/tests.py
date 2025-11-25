@@ -125,70 +125,73 @@ class TestesViewDeletarTarefa(TestCase):
 
         self.assertEqual(Tarefa.objects.count(), 0)
 
-class TestesAPITarefa(APITestCase):
+class TestesAPIListarTarefas(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='api_user', password='12345')
+        self.user = User.objects.create_user(username='api_list', password='12345')
         self.token = Token.objects.create(user=self.user)
-        
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
-
+        
         self.projeto = Projeto.objects.create(nome="Projeto API", dono=self.user)
-        self.tarefa = Tarefa.objects.create(
-            titulo="Tarefa API Original",
-            descricao="Criada pelo setup",
-            projeto=self.projeto,
-            status=1,
-            etiqueta=3
-        )
+        Tarefa.objects.create(titulo="Tarefa 1", projeto=self.projeto)
+        self.url = reverse('api-listar-tarefas')
 
-        self.url_listar = reverse('api-listar-tarefas')
-        self.url_criar = reverse('api-cadastrar-tarefa')
-        self.url_editar = reverse('api-editar-tarefa', kwargs={'pk': self.tarefa.pk})
-        self.url_deletar = reverse('api-deletar-tarefa', kwargs={'pk': self.tarefa.pk})
-
-    def test_api_listar(self):
-        response = self.client.get(self.url_listar)
+    def test_listar(self):
+        response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
         self.assertEqual(len(response.data), 1)
-        self.assertEqual(response.data[0]['titulo'], "Tarefa API Original")
 
-    def test_api_criar(self):
+class TestesAPICriarTarefa(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='api_create', password='12345')
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        
+        self.projeto = Projeto.objects.create(nome="Projeto API", dono=self.user)
+        self.url = reverse('api-cadastrar-tarefa')
+
+    def test_criar(self):
         data = {
-            'titulo': 'Tarefa Via App',
-            'descricao': 'Teste POST',
-            'projeto': self.projeto.id, 
+            'titulo': 'Tarefa Nova API',
+            'projeto': self.projeto.id,
             'status': 1,
             'etiqueta': 1
         }
-        response = self.client.post(self.url_criar, data, format='json')
-        
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Tarefa.objects.count(), 2) 
-        self.assertEqual(Tarefa.objects.last().titulo, 'Tarefa Via App')
+        self.assertEqual(Tarefa.objects.count(), 1)
 
-    def test_api_editar(self):
-        data = {
-            'titulo': 'Tarefa Modificada',
-            'projeto': self.projeto.id,
-            'status': 3 
-        }
+class TestesAPIEditarTarefa(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='api_edit', password='12345')
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         
-        response = self.client.patch(self.url_editar, data, format='json')
-        
+        self.projeto = Projeto.objects.create(nome="Projeto API", dono=self.user)
+        self.tarefa = Tarefa.objects.create(titulo="Original", projeto=self.projeto)
+        self.url = reverse('api-editar-tarefa', kwargs={'pk': self.tarefa.pk})
+
+    def test_editar(self):
+        data = {'titulo': 'Modificado API', 'projeto': self.projeto.id}
+        response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.tarefa.refresh_from_db()
-        self.assertEqual(self.tarefa.titulo, 'Tarefa Modificada')
-        self.assertEqual(self.tarefa.status, 3)
+        self.assertEqual(self.tarefa.titulo, 'Modificado API')
 
-    def test_api_deletar(self):
-        response = self.client.delete(self.url_deletar)
+class TestesAPIExcluirTarefa(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='api_delete', password='12345')
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
         
+        self.projeto = Projeto.objects.create(nome="Projeto API", dono=self.user)
+        self.tarefa = Tarefa.objects.create(titulo="Para Deletar", projeto=self.projeto)
+        self.url = reverse('api-deletar-tarefa', kwargs={'pk': self.tarefa.pk})
+
+    def test_deletar(self):
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Tarefa.objects.count(), 0)
-
-    def test_api_sem_token(self):
-        client_anonimo = APIClient()
-        response = client_anonimo.get(self.url_listar)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)

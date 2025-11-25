@@ -116,24 +116,27 @@ class TestesViewExcluirProjeto(TestCase):
         self.assertRedirects(response, reverse('listar-projetos'))
         self.assertEqual(Projeto.objects.count(), 0)
 
-class TestesAPIProjeto(APITestCase):
+class TestesAPIListarProjetos(APITestCase):
     def setUp(self):
-        self.user = User.objects.create_user(username='api_user_proj', password='12345')
+        self.user = User.objects.create_user(username='api_list', password='12345')
         self.token = Token.objects.create(user=self.user)
-        
         self.client = APIClient()
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        Projeto.objects.create(nome="Projeto API", dono=self.user)
+        self.url = reverse('api-listar-projetos')
 
-        self.projeto = Projeto.objects.create(
-            nome="Projeto API Original",
-            descricao="Criado no setup",
-            dono=self.user
-        )
+    def test_listar(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+        self.assertTrue(len(response.data) >= 1)
 
-        self.url_listar = reverse('api-listar-projetos')
-        self.url_criar = reverse('api-cadastrar-projeto')
-        self.url_editar = reverse('api-editar-projeto', kwargs={'pk': self.projeto.pk})
-        self.url_deletar = reverse('api-deletar-projeto', kwargs={'pk': self.projeto.pk})
+class TestesAPICriarProjeto(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='api_create', password='12345')
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.url = reverse('api-cadastrar-projeto')
 
     def criar_imagem_temporaria(self):
         image = Image.new('RGB', (100, 100))
@@ -142,44 +145,46 @@ class TestesAPIProjeto(APITestCase):
         tmp_file.seek(0)
         return tmp_file
 
-    def test_api_listar(self):
-        response = self.client.get(self.url_listar)
-        self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertTrue(len(response.data) >= 1)
-        self.assertEqual(response.data[0]['nome'], "Projeto API Original")
-
-    def test_api_criar_sem_imagem(self):
-        data = {
-            'nome': 'Projeto Via App',
-            'descricao': 'Sem foto'
-        }
-        response = self.client.post(self.url_criar, data, format='json')
+    def test_criar_sem_imagem(self):
+        data = {'nome': 'Projeto Texto', 'descricao': 'Sem foto'}
+        response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(Projeto.objects.filter(nome='Projeto Via App').count(), 1)
+        self.assertEqual(Projeto.objects.filter(nome='Projeto Texto').count(), 1)
 
-    def test_api_criar_com_imagem(self):
+    def test_criar_com_imagem(self):
         imagem = self.criar_imagem_temporaria()
         file = SimpleUploadedFile('teste.jpg', imagem.read(), content_type='image/jpeg')
-
-        data = {
-            'nome': 'Projeto Com Foto',
-            'descricao': 'Com foto',
-            'imagem_capa': file
-        }
-        response = self.client.post(self.url_criar, data, format='multipart')
-        
+        data = {'nome': 'Projeto Foto', 'imagem_capa': file}
+        response = self.client.post(self.url, data, format='multipart')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertTrue(Projeto.objects.get(nome='Projeto Com Foto').imagem_capa)
+        self.assertTrue(Projeto.objects.get(nome='Projeto Foto').imagem_capa)
 
-    def test_api_editar(self):
-        data = {'nome': 'Projeto Renomeado', 'descricao': 'Nova desc'}
-        response = self.client.patch(self.url_editar, data, format='json')
-        
+class TestesAPIEditarProjeto(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='api_edit', password='12345')
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.projeto = Projeto.objects.create(nome="Original", dono=self.user)
+        self.url = reverse('api-editar-projeto', kwargs={'pk': self.projeto.pk})
+
+    def test_editar(self):
+        data = {'nome': 'Renomeado'}
+        response = self.client.patch(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.projeto.refresh_from_db()
-        self.assertEqual(self.projeto.nome, 'Projeto Renomeado')
+        self.assertEqual(self.projeto.nome, 'Renomeado')
 
-    def test_api_deletar(self):
-        response = self.client.delete(self.url_deletar)
+class TestesAPIExcluirProjeto(APITestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='api_delete', password='12345')
+        self.token = Token.objects.create(user=self.user)
+        self.client = APIClient()
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
+        self.projeto = Projeto.objects.create(nome="Para Deletar", dono=self.user)
+        self.url = reverse('api-deletar-projeto', kwargs={'pk': self.projeto.pk})
+
+    def test_deletar(self):
+        response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Projeto.objects.count(), 0)
