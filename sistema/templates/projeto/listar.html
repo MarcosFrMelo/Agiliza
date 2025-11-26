@@ -8,11 +8,11 @@
     
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h2 class="fw-bold text-primary">Meus Projetos</h2>
-            <p class="text-muted">Gerencie seus quadros e tarefas</p>
+            <h2 class="fw-bold text-dark mb-0">Meus Projetos</h2>
+            <p class="text-muted small">Gerencie seus quadros e atividades</p>
         </div>
-        <a href="{% url 'novo-projeto' %}" class="btn btn-success btn-lg shadow-sm">
-            <i class="bi bi-plus-lg"></i> Novo Projeto
+        <a href="{% url 'novo-projeto' %}" class="btn btn-success shadow-sm">
+            <i class="bi bi-plus-lg me-1"></i> Novo Projeto
         </a>
     </div>
 
@@ -20,37 +20,37 @@
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             {% for projeto in projetos %}
             <div class="col">
-                <div class="card h-100 shadow-sm border-0 card-hover">
+                <div class="card h-100 shadow-sm border-0 card-hover overflow-hidden">
                     
-                    <div class="ratio ratio-21x9 bg-light border-bottom d-flex align-items-center justify-content-center overflow-hidden rounded-top">
+                    <div class="ratio ratio-21x9 bg-secondary bg-opacity-10 border-bottom">
                         {% if projeto.imagem_capa %}
-                            <img src="{{ projeto.imagem_capa.url }}" class="object-fit-cover w-100 h-100" alt="{{ projeto.nome }}">
+                            <img src="{{ projeto.imagem_capa.url }}" class="object-fit-cover" alt="{{ projeto.nome }}">
                         {% else %}
-                            <div class="text-center text-secondary py-4">
-                                <span style="font-size: 3rem;">📁</span>
+                            <div class="d-flex align-items-center justify-content-center text-secondary">
+                                <i class="bi bi-folder2-open display-4 opacity-25"></i>
                             </div>
                         {% endif %}
                     </div>
 
                     <div class="card-body d-flex flex-column">
-                        <h5 class="card-title fw-bold text-dark mb-2">{{ projeto.nome }}</h5>
+                        <h5 class="card-title fw-bold text-primary">{{ projeto.nome }}</h5>
                         <p class="card-text text-muted small flex-grow-1">
                             {{ projeto.descricao|default:"Sem descrição definida."|truncatechars:80 }}
                         </p>
                         
-                        <div class="mt-3 d-flex gap-2">
-                            <a href="{% url 'quadro-projeto' projeto.id %}" class="btn btn-primary flex-grow-1">
-                                Abrir Quadro
+                        <div class="d-flex gap-2 mt-3">
+                            <a href="{% url 'quadro-projeto' projeto.id %}" class="btn btn-primary flex-grow-1 btn-sm">
+                                <i class="bi bi-layout-three-columns me-1"></i> Quadro
                             </a>
                             
                             <div class="dropdown">
-                                <button class="btn btn-light border" type="button" data-bs-toggle="dropdown">
-                                    ⋮
+                                <button class="btn btn-light border btn-sm" type="button" data-bs-toggle="dropdown">
+                                    <i class="bi bi-three-dots-vertical"></i>
                                 </button>
-                                <ul class="dropdown-menu dropdown-menu-end">
-                                    <li><a class="dropdown-item" href="{% url 'editar-projeto' projeto.id %}">Editar</a></li>
+                                <ul class="dropdown-menu dropdown-menu-end shadow border-0">
+                                    <li><a class="dropdown-item" href="{% url 'editar-projeto' projeto.id %}"><i class="bi bi-pencil me-2"></i>Editar</a></li>
                                     <li><hr class="dropdown-divider"></li>
-                                    <li><a class="dropdown-item text-danger" href="{% url 'deletar-projeto' projeto.id %}">Excluir</a></li>
+                                    <li><a class="dropdown-item text-danger" href="{% url 'deletar-projeto' projeto.id %}"><i class="bi bi-trash me-2"></i>Excluir</a></li>
                                 </ul>
                             </div>
                         </div>
@@ -60,11 +60,13 @@
             {% endfor %}
         </div>
     {% else %}
-        <div class="text-center py-5 text-muted">
-            <div style="font-size: 4rem; opacity: 0.3;">📂</div>
-            <h4 class="mt-3">Nenhum projeto encontrado</h4>
-            <p>Comece criando seu primeiro quadro de tarefas.</p>
-            <a href="{% url 'novo-projeto' %}" class="btn btn-outline-primary mt-2">Criar Projeto</a>
+        <div class="text-center py-5">
+            <div class="mb-3 text-muted opacity-25">
+                <i class="bi bi-inbox" style="font-size: 4rem;"></i>
+            </div>
+            <h4 class="fw-bold">Nenhum projeto encontrado</h4>
+            <p class="text-muted">Crie seu primeiro projeto para começar a se organizar.</p>
+            <a href="{% url 'novo-projeto' %}" class="btn btn-outline-primary mt-2">Criar Projeto Agora</a>
         </div>
     {% endif %}
 

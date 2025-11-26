@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import CreateView, UpdateView, DeleteView
+from django.views.generic import CreateView, UpdateView, DeleteView, ListView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Tarefa
 from .forms import TarefaForm
@@ -9,6 +9,21 @@ from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, D
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .serializers import TarefaSerializer
+from projeto.models import Projeto
+
+class QuadroTarefa(LoginRequiredMixin, ListView):
+    model = Tarefa
+    template_name = 'tarefa/quadro.html'
+    context_object_name = 'tarefas'
+
+    def get_queryset(self):
+        self.projeto = get_object_or_404(Projeto, pk=self.kwargs['pk'])
+        return Tarefa.objects.filter(projeto=self.projeto)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['projeto'] = self.projeto
+        return context
 
 class TarefaNova(LoginRequiredMixin, CreateView):
     model = Tarefa

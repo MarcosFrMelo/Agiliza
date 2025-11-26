@@ -11,39 +11,29 @@
             <div class="card shadow border-0 rounded-4">
                 <div class="card-header bg-white border-0 pt-4 pb-2 text-center">
                     <h3 class="fw-bold text-success">Criar Projeto</h3>
-                    <p class="text-muted small">Preencha as informações abaixo</p>
+                    <p class="text-muted small">Preencha as informações do novo quadro</p>
                 </div>
 
                 <div class="card-body p-4">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
 
-                        {% for field in form %}
-                            <div class="mb-3">
-                                {% if field.field.widget.input_type == 'file' %}
-                                    <label for="{{ field.id_for_label }}" class="form-label small text-muted ms-1">{{ field.label }}</label>
-                                    <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control">
-                                {% else %}
-                                    <div class="form-floating">
-                                        <input 
-                                            type="{{ field.field.widget.input_type }}" 
-                                            name="{{ field.name }}" 
-                                            id="{{ field.id_for_label }}"
-                                            class="form-control" 
-                                            placeholder="{{ field.label }}"
-                                            {% if field.value %}value="{{ field.value }}"{% endif %}
-                                        >
-                                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                    </div>
-                                {% endif %}
-                                
-                                {% for error in field.errors %}
-                                    <div class="text-danger small mt-1 ps-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endfor %}
+                        <div class="form-floating mb-3">
+                            <input type="text" name="nome" class="form-control" id="id_nome" placeholder="Nome do Projeto" required>
+                            <label for="id_nome">Nome do Projeto</label>
+                        </div>
 
-                        <div class="d-grid gap-2 mt-4">
+                        <div class="form-floating mb-3">
+                            <textarea name="descricao" class="form-control" id="id_descricao" placeholder="Descrição" style="height: 100px"></textarea>
+                            <label for="id_descricao">Descrição (Opcional)</label>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="id_imagem_capa" class="form-label text-muted small ms-1">Imagem de Capa</label>
+                            <input type="file" name="imagem_capa" class="form-control" id="id_imagem_capa">
+                        </div>
+
+                        <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-success btn-lg">Salvar Projeto</button>
                             <a href="{% url 'listar-projetos' %}" class="btn btn-light text-muted">Cancelar</a>
                         </div>

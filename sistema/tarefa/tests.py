@@ -32,6 +32,33 @@ class TestesModelTarefa(TestCase):
         self.assertEqual(self.instancia.titulo, "Comprar passagens")
         self.assertEqual(self.instancia.projeto, self.projeto)
 
+class TestesViewQuadroTarefa(TestCase):
+    def setUp(self):
+        self.user = User.objects.create_user(username='tester', password='123')
+        self.client.login(username='tester', password='123')
+        self.projeto1 = Projeto.objects.create(nome="Projeto Principal", dono=self.user)
+        self.tarefa_p1 = Tarefa.objects.create(titulo="Tarefa do P1", projeto=self.projeto1, status=1)
+        self.projeto2 = Projeto.objects.create(nome="Outro Projeto", dono=self.user)
+        self.tarefa_p2 = Tarefa.objects.create(titulo="Tarefa do P2", projeto=self.projeto2, status=1)    
+        self.url = reverse('quadro-projeto', kwargs={'projeto_id': self.projeto1.pk})
+
+    def test_acesso_quadro(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, 'tarefa/quadro.html')
+
+    def test_filtro_tarefas(self):
+        response = self.client.get(self.url)
+        tarefas_na_tela = response.context['tarefas']
+        self.assertIn(self.tarefa_p1, tarefas_na_tela)
+        self.assertNotIn(self.tarefa_p2, tarefas_na_tela)
+        
+    def test_contexto_projeto(self):
+        response = self.client.get(self.url)
+        projeto_na_tela = response.context['projeto']
+        self.assertEqual(projeto_na_tela.nome, "Projeto Principal")
+
+
 class TestesViewNovaTarefa(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='teste', password='12345')
@@ -195,3 +222,4 @@ class TestesAPIExcluirTarefa(APITestCase):
         response = self.client.delete(self.url)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT)
         self.assertEqual(Tarefa.objects.count(), 0)
+

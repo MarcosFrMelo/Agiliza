@@ -1,28 +1,67 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block titulo %}Nova Tarefa{% endblock %}
+{% block titulo %}Nova Tarefa - Agiliza{% endblock %}
 
 {% block conteudo %}
-<div class="container mt-5">
+<div class="container py-5">
     <div class="row justify-content-center">
         <div class="col-md-6">
-            <div class="card shadow">
-                <div class="card-header bg-primary text-white">
-                    <h4 class="mb-0">Nova Tarefa em: {{ projeto.nome }}</h4>
+            
+            <div class="card shadow border-0 rounded-4">
+                <div class="card-header bg-white border-0 pt-4 pb-2 text-center">
+                    <h5 class="fw-bold text-primary">Adicionar Tarefa</h5>
+                    <p class="text-muted small">No projeto: {{ projeto.nome }}</p>
                 </div>
-                <div class="card-body">
+
+                <div class="card-body p-4">
                     <form method="POST">
                         {% csrf_token %}
-                        
-                        {{ form.as_p }}
 
-                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                            <a href="{% url 'quadro-projeto' projeto.id %}" class="btn btn-secondary me-md-2">Cancelar</a>
-                            <button type="submit" class="btn btn-success">Criar Tarefa</button>
+                        <div class="form-floating mb-3">
+                            <input type="text" name="titulo" class="form-control" id="id_titulo" placeholder="Título" required>
+                            <label for="id_titulo">Título da Tarefa</label>
+                        </div>
+
+                        <div class="form-floating mb-3">
+                            <textarea name="descricao" class="form-control" id="id_descricao" placeholder="Detalhes" style="height: 100px"></textarea>
+                            <label for="id_descricao">Descrição</label>
+                        </div>
+
+                        <div class="row g-2 mb-4">
+                            <div class="col-6">
+                                <div class="form-floating">
+                                    <select name="status" class="form-select" id="id_status">
+                                        <option value="1" selected>A Fazer</option>
+                                        <option value="2">Fazendo</option>
+                                        <option value="3">Feito</option>
+                                    </select>
+                                    <label for="id_status">Status</label>
+                                </div>
+                            </div>
+                            
+                            <div class="col-6">
+                                <div class="form-floating">
+                                    <select name="etiqueta" class="form-select" id="id_etiqueta">
+                                        <option value="1">Urgente</option>
+                                        <option value="2">Importante</option>
+                                        <option value="3" selected>Normal</option>
+                                        <option value="4">Baixa Prioridade</option>
+                                        <option value="5">Opcional</option>
+                                    </select>
+                                    <label for="id_etiqueta">Prioridade</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">Criar Tarefa</button>
+                            <a href="{% url 'quadro-projeto' projeto.id %}" class="btn btn-light text-muted">Cancelar</a>
                         </div>
                     </form>
                 </div>
             </div>
+
         </div>
     </div>
 </div>

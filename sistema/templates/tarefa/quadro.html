@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block titulo %}Quadro - {{ projeto.nome }}{% endblock %}
+
+{% block conteudo %}
+<div class="container-fluid py-4 px-4" style="height: calc(100vh - 70px); overflow-y: hidden;">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb mb-1">
+                    <li class="breadcrumb-item"><a href="{% url 'listar-projetos' %}" class="text-decoration-none">Projetos</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">{{ projeto.nome }}</li>
+                </ol>
+            </nav>
+            <h2 class="fw-bold text-dark mb-0">{{ projeto.nome }}</h2>
+        </div>
+        <div>
+            <a href="{% url 'nova-tarefa' projeto.id %}" class="btn btn-primary shadow-sm">
+                <i class="bi bi-plus-lg me-1"></i> Nova Tarefa
+            </a>
+        </div>
+    </div>
+
+    <div class="row flex-nowrap h-100 pb-4 overflow-auto g-4">
+        
+        <div class="col-12 col-md-4 col-lg-3" style="min-width: 300px;">
+            <div class="card bg-light border-0 h-100 shadow-sm">
+                <div class="card-header bg-white border-bottom-0 fw-bold text-secondary py-3">
+                    <i class="bi bi-circle me-2"></i> A Fazer
+                </div>
+                <div class="card-body overflow-auto p-2">
+                    {% for tarefa in tarefas %}
+                        {% if tarefa.status == 1 %} 
+                            {% include 'projeto/card_tarefa.html' %}
+                        {% endif %}
+                    {% endfor %}
+                    <a href="{% url 'nova-tarefa' projeto.id %}" class="btn btn-outline-secondary w-100 border-dashed mt-2 btn-sm">+ Adicionar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-3" style="min-width: 300px;">
+            <div class="card bg-info-subtle border-0 h-100 shadow-sm">
+                <div class="card-header bg-info-subtle border-bottom-0 fw-bold text-info-emphasis py-3">
+                    <i class="bi bi-arrow-repeat me-2"></i> Fazendo
+                </div>
+                <div class="card-body overflow-auto p-2">
+                    {% for tarefa in tarefas %}
+                        {% if tarefa.status == 2 %}
+                            {% include 'projeto/card_tarefa.html' %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="col-12 col-md-4 col-lg-3" style="min-width: 300px;">
+            <div class="card bg-success-subtle border-0 h-100 shadow-sm">
+                <div class="card-header bg-success-subtle border-bottom-0 fw-bold text-success-emphasis py-3">
+                    <i class="bi bi-check-circle-fill me-2"></i> Feito
+                </div>
+                <div class="card-body overflow-auto p-2">
+                    {% for tarefa in tarefas %}
+                        {% if tarefa.status == 3 %}
+                            {% include 'projeto/card_tarefa.html' %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<style>
+    .border-dashed { border-style: dashed !important; }
+    .card-body::-webkit-scrollbar { width: 6px; }
+    .card-body::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.1); border-radius: 4px; }
+</style>
+{% endblock %}

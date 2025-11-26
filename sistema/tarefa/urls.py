@@ -9,4 +9,5 @@ urlpatterns = [
     path('api/cadastrar/', APICriarTarefa.as_view(), name='api-cadastrar-tarefa'),
     path('api/editar/<int:pk>/', APIEditarTarefa.as_view(), name='api-editar-tarefa'),
     path('api/deletar/<int:pk>/', APIExcluirTarefa.as_view(), name='api-deletar-tarefa'),
+    path('quadro/<int:pk>/', QuadroTarefa.as_view(), name='quadro-projeto'),
 ]

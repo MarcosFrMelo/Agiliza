@@ -11,46 +11,44 @@
             <div class="card shadow border-0 rounded-4">
                 <div class="card-header bg-white border-0 pt-4 pb-2 text-center">
                     <h3 class="fw-bold text-primary">Editar Projeto</h3>
-                    <p class="text-muted small">Alterar informações do quadro</p>
+                    <p class="text-muted small">Atualize os dados do seu quadro</p>
                 </div>
 
                 <div class="card-body p-4">
                     <form method="POST" enctype="multipart/form-data">
                         {% csrf_token %}
 
-                        {% for field in form %}
-                            <div class="mb-3">
-                                {% if field.field.widget.input_type == 'file' %}
-                                    <label for="{{ field.id_for_label }}" class="form-label small text-muted ms-1">{{ field.label }}</label>
-                                    
-                                    {% if field.value %}
-                                        <div class="mb-2 small">
-                                            Atual: <a href="/media/{{ field.value }}" target="_blank">Ver imagem</a>
-                                        </div>
-                                    {% endif %}
-                                    
-                                    <input type="file" name="{{ field.name }}" id="{{ field.id_for_label }}" class="form-control">
-                                {% else %}
-                                    <div class="form-floating">
-                                        <input 
-                                            type="{{ field.field.widget.input_type }}" 
-                                            name="{{ field.name }}" 
-                                            id="{{ field.id_for_label }}"
-                                            class="form-control" 
-                                            placeholder="{{ field.label }}"
-                                            value="{{ field.value|default_if_none:'' }}"
-                                        >
-                                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-                                    </div>
-                                {% endif %}
-                                
-                                {% for error in field.errors %}
-                                    <div class="text-danger small mt-1 ps-1">{{ error }}</div>
-                                {% endfor %}
-                            </div>
-                        {% endfor %}
+                        <div class="form-floating mb-3">
+                            <input type="text" name="nome" class="form-control" id="id_nome" 
+                                   placeholder="Nome" value="{{ form.nome.value|default:'' }}" required>
+                            <label for="id_nome">Nome do Projeto</label>
+                            <div class="text-danger small">{{ form.nome.errors }}</div>
+                        </div>
 
-                        <div class="d-grid gap-2 mt-4">
+                        <div class="form-floating mb-4">
+                            <textarea name="descricao" class="form-control" id="id_descricao" 
+                                      placeholder="Descrição" style="height: 100px">{{ form.descricao.value|default:'' }}</textarea>
+                            <label for="id_descricao">Descrição</label>
+                        </div>
+
+                        <div class="mb-4 p-3 bg-light rounded border">
+                            <label class="form-label fw-bold text-muted small mb-3">Imagem de Capa</label>
+                            
+                            {% if form.instance.imagem_capa %}
+                                <div class="mb-3 text-center position-relative">
+                                    <img src="{{ form.instance.imagem_capa.url }}" 
+                                         class="img-fluid rounded shadow-sm" 
+                                         style="max-height: 200px; object-fit: cover;" 
+                                         alt="Capa Atual">
+                                    <div class="mt-1 text-muted small fst-italic">Capa atual</div>
+                                </div>
+                            {% endif %}
+
+                            <input type="file" name="imagem_capa" class="form-control" id="id_imagem_capa">
+                            <div class="form-text small mt-2">Selecione um novo arquivo apenas se quiser trocar a imagem atual.</div>
+                        </div>
+
+                        <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary btn-lg">Salvar Alterações</button>
                             <a href="{% url 'listar-projetos' %}" class="btn btn-light text-muted">Cancelar</a>
                         </div>
