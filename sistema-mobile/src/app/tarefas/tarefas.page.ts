@@ -1,155 +1,110 @@
-import { Component, NgZone } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, LoadingController, NavController, ToastController, AlertController } from '@ionic/angular';
-import { Storage } from '@ionic/storage-angular';
-import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
-import { Usuario } from '../login/usuario.model';
-import { addIcons } from 'ionicons';
-import { add, pencilOutline, trashOutline, checkmarkCircleOutline, alertCircleOutline } from 'ionicons/icons';
-import { Router } from '@angular/router';
+import { IonicModule, ActionSheetController, ToastController } from '@ionic/angular';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tarefas',
   templateUrl: './tarefas.page.html',
   styleUrls: ['./tarefas.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
-  providers: [Storage]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HttpClientModule]
 })
-export class TarefasPage {
+export class TarefasPage implements OnInit {
 
-  public usuario: Usuario = new Usuario();
-  public lista_tarefas: any[] = [];
-  
-  public projetoIdFiltro: number | null = null;
-  public nomeProjetoFiltro: string = '';
+  projetoId: string | null = null;
+  tarefas: any[] = [];
+  segmento = '1';
 
   constructor(
-    public storage: Storage,
-    public controle_toast: ToastController,
-    public controle_navegacao: NavController,
-    public controle_carregamento: LoadingController,
-    public controle_alerta: AlertController,
+    private route: ActivatedRoute,
+    private http: HttpClient,
     private router: Router,
-    private ngZone: NgZone
-  ) {
-    addIcons({ add, pencilOutline, trashOutline, checkmarkCircleOutline, alertCircleOutline });
+    private actionSheetCtrl: ActionSheetController,
+    private toastCtrl: ToastController
+  ) { }
 
-    const nav = this.router.getCurrentNavigation();
-    if (nav?.extras?.state) {
-      this.projetoIdFiltro = nav.extras.state['projeto_id'];
-      this.nomeProjetoFiltro = nav.extras.state['projeto_nome'];
+  ngOnInit() {
+    this.projetoId = this.route.snapshot.paramMap.get('id');
+  }
+
+  ionViewWillEnter() {
+    this.carregarTarefas();
+  }
+
+  carregarTarefas() {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
+    const url = `${environment.apiUrl}/tarefa/api/listar/?projeto_id=${this.projetoId}`;
+
+    this.http.get<any[]>(url, { headers }).subscribe({
+      next: (dados) => this.tarefas = dados,
+      error: (e) => console.error(e)
+    });
+  }
+
+  get tarefasFiltradas() {
+    return this.tarefas.filter(t => t.status == this.segmento);
+  }
+
+  getCorPrioridade(etiqueta: number) {
+    switch(etiqueta) {
+      case 1: return 'danger';
+      case 2: return 'warning';
+      case 3: return 'primary';
+      case 4: return 'medium';
+      case 5: return 'light'; 
+      default: return 'medium';
     }
   }
 
-  async ionViewWillEnter() {
-    await this.storage.create();
-    const registro = await this.storage.get('usuario');
-
-    if (registro) {
-      this.usuario = Object.assign(new Usuario(), registro);
-      this.consultarTarefas(); 
-    } else {
-      this.controle_navegacao.navigateRoot('/login');
-    }
+  getNomePrioridade(etiqueta: number) {
+    const nomes = ['', 'Urgente', 'Importante', 'Normal', 'Baixa', 'Opcional'];
+    return nomes[etiqueta] || 'Normal';
   }
 
-  async consultarTarefas() {
-    let urlApi = 'http://127.0.0.1:8000/tarefa/api/listar/';
-    if (this.projetoIdFiltro) {
-      urlApi += `?projeto_id=${this.projetoIdFiltro}`;
-    }
-
-    const options: HttpOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${this.usuario.token}`
-      },
-      url: urlApi
-    };
-
-    try {
-      const resposta = await CapacitorHttp.get(options);
-      this.ngZone.run(() => {
-        if (resposta.status == 200) {
-          this.lista_tarefas = resposta.data;
-        } else {
-          this.apresenta_mensagem(`Erro ao listar: ${resposta.status}`);
-        }
-      });
-    } catch (erro) {
-      console.error(erro);
-    }
+  async abrirOpcoes(tarefa: any) {
+    const actionSheet = await this.actionSheetCtrl.create({
+      header: tarefa.titulo,
+      buttons: [
+        {
+          text: 'Editar',
+          icon: 'create',
+          handler: () => {
+            this.router.navigate(['/tarefa-cadastro'], { 
+              queryParams: { tarefaId: tarefa.id } 
+            });
+          }
+        },
+        {
+          text: 'Excluir',
+          role: 'destructive',
+          icon: 'trash',
+          handler: () => this.deletarTarefa(tarefa.id)
+        },
+        { text: 'Cancelar', role: 'cancel', icon: 'close' }
+      ]
+    });
+    await actionSheet.present();
   }
 
-  handleRefresh(event: any) {
-    this.consultarTarefas().then(() => {
-      event.target.complete();
+  deletarTarefa(id: number) {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
+    const url = `${environment.apiUrl}/tarefa/api/deletar/${id}/`;
+
+    this.http.delete(url, { headers }).subscribe(() => {
+      this.carregarTarefas();
+      this.toastCtrl.create({ message: 'Tarefa excluída', duration: 2000 }).then(t => t.present());
     });
   }
 
   novaTarefa() {
     this.router.navigate(['/tarefa-cadastro'], { 
-      state: { projeto_pre_selecionado: this.projetoIdFiltro } 
+      queryParams: { projetoId: this.projetoId } 
     });
-  }
-
-  editar(tarefa: any) {
-    this.router.navigate(['/tarefa-cadastro'], { state: { tarefa: tarefa } });
-  }
-
-  async confirmarExclusao(id: number) {
-    const alert = await this.controle_alerta.create({
-      header: 'Tem certeza?',
-      message: 'Deseja excluir esta tarefa?',
-      buttons: [
-        { text: 'Cancelar', role: 'cancel' },
-        {
-          text: 'Excluir',
-          role: 'confirm',
-          handler: () => { this.excluirTarefa(id); }
-        }
-      ]
-    });
-    await alert.present();
-  }
-
-  async excluirTarefa(id: number) {
-    const loading = await this.controle_carregamento.create({ message: 'Excluindo...' });
-    await loading.present();
-
-    const options: HttpOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${this.usuario.token}`
-      },
-      url: `http://127.0.0.1:8000/tarefa/api/deletar/${id}/`
-    };
-
-    CapacitorHttp.delete(options)
-      .then(async (resposta: HttpResponse) => {
-        loading.dismiss();
-        this.ngZone.run(() => {
-          if (resposta.status == 204) {
-            this.apresenta_mensagem('Tarefa excluída!');
-            this.consultarTarefas(); 
-          } else {
-            this.apresenta_mensagem(`Erro ao excluir: ${resposta.status}`);
-          }
-        });
-      })
-      .catch(async () => {
-        loading.dismiss();
-        this.apresenta_mensagem('Erro ao tentar excluir.');
-      });
-  }
-
-  async apresenta_mensagem(texto: string) {
-    const mensagem = await this.controle_toast.create({
-      message: texto,
-      duration: 2000
-    });
-    mensagem.present();
   }
 }

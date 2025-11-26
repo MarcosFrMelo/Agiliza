@@ -1,48 +1,52 @@
-<ion-header>
-  <ion-toolbar color="primary">
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary" style="--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <ion-buttons slot="start">
-      <ion-back-button defaultHref="/tarefas"></ion-back-button>
+      <ion-back-button></ion-back-button>
     </ion-buttons>
     <ion-title>{{ editando ? 'Editar Tarefa' : 'Nova Tarefa' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-list lines="full">
+<ion-content [fullscreen]="true" class="ion-padding">
+  
+  <form (ngSubmit)="salvar()">
     
-    <ion-item>
-      <ion-label position="floating">Título</ion-label>
-      <ion-input [(ngModel)]="tarefa.titulo" type="text"></ion-input>
+    <ion-item lines="full" class="ion-margin-bottom input-custom">
+      <ion-label position="stacked">Título</ion-label>
+      <ion-input [(ngModel)]="tarefa.titulo" name="titulo" type="text" required></ion-input>
     </ion-item>
 
-    <ion-item>
-      <ion-label position="floating">Descrição</ion-label>
-      <ion-textarea [(ngModel)]="tarefa.descricao" rows="3"></ion-textarea>
+    <ion-item lines="full" class="ion-margin-bottom input-custom">
+      <ion-label position="stacked">Descrição</ion-label>
+      <ion-textarea [(ngModel)]="tarefa.descricao" name="descricao" rows="3"></ion-textarea>
     </ion-item>
 
-    <ion-item>
-      <ion-select label="Status" label-placement="floating" [(ngModel)]="tarefa.status">
+    <ion-item lines="full" class="ion-margin-bottom input-custom">
+      <ion-label position="stacked">Status</ion-label>
+      <ion-select [(ngModel)]="tarefa.status" name="status">
         <ion-select-option [value]="1">A Fazer</ion-select-option>
         <ion-select-option [value]="2">Fazendo</ion-select-option>
         <ion-select-option [value]="3">Feito</ion-select-option>
       </ion-select>
     </ion-item>
 
-    <ion-item>
-      <ion-select label="Prioridade" label-placement="floating" [(ngModel)]="tarefa.etiqueta">
-        <ion-select-option [value]="1">Urgente</ion-select-option>
-        <ion-select-option [value]="2">Importante</ion-select-option>
-        <ion-select-option [value]="3">Normal</ion-select-option>
-        <ion-select-option [value]="4">Baixa Prioridade</ion-select-option>
-        <ion-select-option [value]="5">Opcional</ion-select-option>
+    <ion-item lines="full" class="ion-margin-bottom input-custom">
+      <ion-label position="stacked">Prioridade</ion-label>
+      <ion-select [(ngModel)]="tarefa.etiqueta" name="etiqueta">
+        <ion-select-option [value]="1">Urgente (Vermelho)</ion-select-option>
+        <ion-select-option [value]="2">Importante (Amarelo)</ion-select-option>
+        <ion-select-option [value]="3">Normal (Azul)</ion-select-option>
+        <ion-select-option [value]="4">Baixa (Cinza)</ion-select-option>
+        <ion-select-option [value]="5">Opcional (Claro)</ion-select-option>
       </ion-select>
     </ion-item>
 
-  </ion-list>
+    <div class="ion-margin-top">
+      <ion-button type="submit" expand="block" class="btn-primary" shape="round">
+        {{ editando ? 'SALVAR ALTERAÇÕES' : 'ADICIONAR TAREFA' }}
+      </ion-button>
+    </div>
 
-  <div class="ion-padding">
-    <ion-button expand="block" (click)="salvar()" color="primary">
-      Salvar Tarefa
-    </ion-button>
-  </div>
+  </form>
+
 </ion-content>

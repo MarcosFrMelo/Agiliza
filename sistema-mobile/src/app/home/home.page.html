@@ -1,19 +1,26 @@
-<ion-content class="ion-padding" style="--background: #ffffff;">
-  <div style="display: flex; flex-direction: column; height: 100%; justify-content: center; text-align: center;">
+<ion-content class="bg-auth" [fullscreen]="true">
+  <div class="center-content ion-text-center">
     
-    <div style="margin-bottom: 50px;">
-      <ion-icon name="layers-outline" style="font-size: 80px; color: #3880ff;"></ion-icon>
-      <h1 style="font-weight: bold; font-size: 2.5rem; margin-top: 10px;">Agiliza</h1>
-      <p style="color: #666;">Gerencie seus projetos com facilidade.</p>
+    <div style="margin-bottom: 30px;">
+      <ion-icon name="rocket-outline" style="font-size: 80px; color: white; opacity: 0.9;"></ion-icon>
+      <h1 style="color: white; font-weight: 900; margin-top: 10px;">Agiliza</h1>
+      <p style="color: rgba(255,255,255,0.8);">Sua produtividade no máximo</p>
     </div>
 
-    <ion-button expand="block" routerLink="/login" size="large" class="ion-margin-bottom">
-      ENTRAR
-    </ion-button>
-
-    <ion-button expand="block" routerLink="/register" fill="outline" size="large">
-      CRIAR CONTA
-    </ion-button>
+    <ion-card class="auth-card">
+      <ion-card-content class="ion-text-center">
+        <h2 style="color: #333; font-weight: bold;">Vamos começar?</h2>
+        <p class="ion-margin-bottom">Gerencie seus projetos de forma simples.</p>
+        
+        <ion-button expand="block" class="btn-primary" [routerLink]="['/projetos']">
+          MEUS PROJETOS
+        </ion-button>
+        
+        <ion-button fill="clear" color="medium" [routerLink]="['/login']" class="ion-margin-top">
+          Sair da conta
+        </ion-button>
+      </ion-card-content>
+    </ion-card>
 
   </div>
 </ion-content>

@@ -5,7 +5,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from .models import Tarefa
 from .forms import TarefaForm
 from projeto.models import Projeto
-from rest_framework.generics import ListAPIView, CreateAPIView, UpdateAPIView, DestroyAPIView
+from rest_framework.generics import ListAPIView, CreateAPIView, RetrieveUpdateAPIView, DestroyAPIView
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import IsAuthenticated
 from .serializers import TarefaSerializer
@@ -75,7 +75,7 @@ class APICriarTarefa(CreateAPIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-class APIEditarTarefa(UpdateAPIView):
+class APIEditarTarefa(RetrieveUpdateAPIView):
     serializer_class = TarefaSerializer
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

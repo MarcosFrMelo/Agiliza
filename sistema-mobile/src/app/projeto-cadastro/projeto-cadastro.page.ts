@@ -1,152 +1,102 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, NavController, ToastController, LoadingController } from '@ionic/angular';
-import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
-import { Storage } from '@ionic/storage-angular';
-import { Usuario } from '../login/usuario.model';
-import { Router } from '@angular/router';
+import { IonicModule, ToastController } from '@ionic/angular';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-projeto-cadastro',
   templateUrl: './projeto-cadastro.page.html',
   styleUrls: ['./projeto-cadastro.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
-  providers: [Storage]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HttpClientModule]
 })
 export class ProjetoCadastroPage implements OnInit {
 
   projeto = {
-    id: null,
     nome: '',
     descricao: ''
   };
-  
-  usuario: Usuario = new Usuario();
-  titulo = 'Novo Projeto';
-  botaoTexto = 'Cadastrar';
+  arquivoImagem: File | null = null;
+  editando = false;
+  idProjeto: any = null;
 
   constructor(
-    public navCtrl: NavController,
-    public toastCtrl: ToastController,
-    public loadingCtrl: LoadingController,
-    public storage: Storage,
-    private router: Router
-  ) { 
-    const nav = this.router.getCurrentNavigation();
-    if (nav && nav.extras && nav.extras.state) {
-      const dadosRecebidos = nav.extras.state['projeto'];
-      
-      if (dadosRecebidos) {
-        this.projeto = { 
-          id: dadosRecebidos.id,
-          nome: dadosRecebidos.nome,
-          descricao: dadosRecebidos.descricao
-        };
-        this.titulo = 'Editar Projeto';
-        this.botaoTexto = 'Salvar Alterações';
-      }
+    private http: HttpClient,
+    private router: Router,
+    private route: ActivatedRoute,
+    private toastCtrl: ToastController
+  ) { }
+
+  ngOnInit() {
+    this.idProjeto = this.route.snapshot.paramMap.get('id');
+    
+    if (this.idProjeto) {
+      this.editando = true;
+      this.carregarDados();
     }
   }
 
-  async ngOnInit() {
-    await this.storage.create();
-    const registro = await this.storage.get('usuario');
-    if (registro) {
-      this.usuario = Object.assign(new Usuario(), registro);
-    }
+  carregarDados() {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
+    const url = `${environment.apiUrl}/projeto/api/editar/${this.idProjeto}/`;
+
+    this.http.get<any>(url, { headers }).subscribe({
+      next: (dados) => {
+        this.projeto.nome = dados.nome;
+        this.projeto.descricao = dados.descricao;
+      },
+      error: () => this.exibirToast('Erro ao carregar projeto')
+    });
   }
 
   onFileSelected(event: any) {
-    console.log("Arquivo selecionado:", event.target.files[0]);
+    this.arquivoImagem = event.target.files[0];
   }
 
-  async salvar() {
-    if (!this.projeto.nome) {
-      this.mostrarToast('O nome é obrigatório!');
-      return;
+  salvar() {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
+    const formData = new FormData();
+    formData.append('nome', this.projeto.nome);
+    formData.append('descricao', this.projeto.descricao);
+    if (this.arquivoImagem) {
+      formData.append('imagem_capa', this.arquivoImagem);
     }
 
-    if (this.projeto.id) {
-      this.atualizarProjeto();
+    if (this.editando) {
+      const url = `${environment.apiUrl}/projeto/api/editar/${this.idProjeto}/`;
+      this.http.patch(url, formData, { headers }).subscribe({
+        next: () => {
+          this.exibirToast('Projeto atualizado!');
+          this.router.navigate(['/projetos']);
+        },
+        error: (e) => {
+          console.error(e);
+          this.exibirToast('Erro ao atualizar.');
+        }
+      });
+
     } else {
-      this.cadastrarProjeto();
+      const url = `${environment.apiUrl}/projeto/api/cadastrar/`;
+      this.http.post(url, formData, { headers }).subscribe({
+        next: () => {
+          this.exibirToast('Projeto criado!');
+          this.router.navigate(['/projetos']);
+        },
+        error: (e) => {
+          console.error(e);
+          this.exibirToast('Erro ao criar.');
+        }
+      });
     }
   }
 
-  async cadastrarProjeto() {
-    const loading = await this.loadingCtrl.create({ message: 'Salvando...' });
-    await loading.present();
-
-    const options: HttpOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${this.usuario.token}`
-      },
-      url: 'http://127.0.0.1:8000/projeto/api/cadastrar/',
-      data: {
-        nome: this.projeto.nome,
-        descricao: this.projeto.descricao
-      }
-    };
-
-    CapacitorHttp.post(options)
-      .then((res: HttpResponse) => {
-        loading.dismiss();
-        if (res.status === 201) {
-          this.mostrarToast('Projeto criado com sucesso!');
-          this.navCtrl.back();
-        } else {
-          this.mostrarToast('Erro ao criar: ' + res.status);
-        }
-      })
-      .catch((err) => {
-        loading.dismiss();
-        console.error(err);
-        this.mostrarToast('Erro de conexão.');
-      });
-  }
-
-  async atualizarProjeto() {
-    const loading = await this.loadingCtrl.create({ message: 'Atualizando...' });
-    await loading.present();
-
-    const options: HttpOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${this.usuario.token}`
-      },
-      url: `http://127.0.0.1:8000/projeto/api/editar/${this.projeto.id}/`,
-      data: {
-        nome: this.projeto.nome,
-        descricao: this.projeto.descricao
-      }
-    };
-
-    CapacitorHttp.put(options)
-      .then((res: HttpResponse) => {
-        loading.dismiss();
-        if (res.status === 200) {
-          this.mostrarToast('Projeto atualizado!');
-          this.navCtrl.back();
-        } else {
-          this.mostrarToast('Erro ao atualizar: ' + res.status);
-        }
-      })
-      .catch((err) => {
-        loading.dismiss();
-        console.error(err);
-        this.mostrarToast('Erro de conexão.');
-      });
-  }
-
-  async mostrarToast(msg: string) {
+  async exibirToast(msg: string) {
     const t = await this.toastCtrl.create({ message: msg, duration: 2000 });
     t.present();
-  }
-
-  cancelar() {
-    this.navCtrl.back();
   }
 }

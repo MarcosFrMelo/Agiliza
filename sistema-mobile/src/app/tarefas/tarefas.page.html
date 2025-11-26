@@ -1,43 +1,58 @@
 <ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>Minhas Tarefas</ion-title>
-    <ion-buttons slot="end">
-      <ion-back-button defaultHref="/home"></ion-back-button>
+  <ion-toolbar color="primary" style="--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/projetos"></ion-back-button>
     </ion-buttons>
+    <ion-title>Quadro de Tarefas</ion-title>
+  </ion-toolbar>
+
+  <ion-toolbar color="light">
+    <ion-segment [(ngModel)]="segmento" mode="md">
+      <ion-segment-button value="1">
+        <ion-label>A Fazer</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="2">
+        <ion-label>Fazendo</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="3">
+        <ion-label>Feito</ion-label>
+      </ion-segment-button>
+    </ion-segment>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" style="--background: #f4f5f8;">
   
-  <ion-list>
-    <ion-item-sliding *ngFor="let tarefa of lista_tarefas">
-      <ion-item lines="full">
-        <ion-label>
-          <h2>{{ tarefa.titulo }}</h2>
-          <p>
-            <ion-text color="medium">{{ tarefa.projeto_nome }}</ion-text> | 
-            <ion-text [color]="tarefa.status == 3 ? 'success' : 'warning'">{{ tarefa.status_display }}</ion-text>
-          </p>
-          <p>Prioridade: {{ tarefa.etiqueta_display }}</p>
-        </ion-label>
-        <ion-note slot="end" style="font-size: 0.8rem;">
-          {{ tarefa.data_criacao | date:'dd/MM' }}
-        </ion-note>
-      </ion-item>
+  <ion-list style="background: transparent;" class="ion-padding-top">
+    
+    <ion-card *ngFor="let tarefa of tarefasFiltradas" style="border-radius: 12px; margin-inline: 16px; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+      <ion-card-content>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+          <div>
+            <ion-badge [color]="getCorPrioridade(tarefa.etiqueta)" style="margin-bottom: 8px; font-weight: normal;">
+              {{ getNomePrioridade(tarefa.etiqueta) }}
+            </ion-badge>
+            
+            <h2 style="font-weight: bold; color: #333; font-size: 1.1rem;">{{ tarefa.titulo }}</h2>
+            <p style="color: #666; font-size: 0.9rem;">{{ tarefa.descricao }}</p>
+          </div>
 
-      <ion-item-options side="end">
-        <ion-item-option color="primary" (click)="editar(tarefa)">
-          <ion-icon slot="icon-only" name="pencil-outline"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="confirmarExclusao(tarefa.id)">
-          <ion-icon slot="icon-only" name="trash-outline"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
-    </ion-item-sliding>
+          <ion-button fill="clear" size="small" color="medium" (click)="abrirOpcoes(tarefa)">
+            <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
+          </ion-button>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <div *ngIf="tarefasFiltradas.length === 0" class="ion-text-center ion-padding" style="margin-top: 40px; opacity: 0.5;">
+      <ion-icon name="checkmark-done-circle-outline" style="font-size: 60px;"></ion-icon>
+      <p>Nenhuma tarefa nesta coluna</p>
+    </div>
+
   </ion-list>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="novaTarefa()" color="tertiary">
+    <ion-fab-button color="primary" (click)="novaTarefa()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>

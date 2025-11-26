@@ -1,121 +1,92 @@
-import { Component, NgZone, OnInit } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, LoadingController, NavController, ToastController } from '@ionic/angular';
-import { Storage } from '@ionic/storage-angular';
-import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
-import { Usuario } from '../login/usuario.model';
-import { Tarefa } from '../tarefas/tarefa.model';
-import { Router } from '@angular/router';
+import { IonicModule, ToastController } from '@ionic/angular';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-tarefa-cadastro',
   templateUrl: './tarefa-cadastro.page.html',
   styleUrls: ['./tarefa-cadastro.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
-  providers: [Storage]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HttpClientModule]
 })
 export class TarefaCadastroPage implements OnInit {
 
-  public usuario: Usuario = new Usuario();
-  public tarefa: Tarefa = new Tarefa();
-  public lista_projetos: any[] = [];
-  public editando: boolean = false;
+  tarefa = {
+    titulo: '',
+    descricao: '',
+    status: 1,
+    etiqueta: 3,
+    projeto: null
+  };
+
+  projetoId: any = null;
+  tarefaId: any = null;
+  editando = false;
 
   constructor(
-    public storage: Storage,
-    public navCtrl: NavController,
-    public loadingCtrl: LoadingController,
-    public toastCtrl: ToastController,
+    private http: HttpClient,
     private router: Router,
-    private ngZone: NgZone
-  ) {
-    // Recebe dados se for edição
-    const nav = this.router.getCurrentNavigation();
-    if (nav?.extras?.state?.['tarefa']) {
-      this.tarefa = nav.extras.state['tarefa'];
-      this.editando = true;
-    }
-  }
+    private route: ActivatedRoute,
+    private toastCtrl: ToastController
+  ) { }
 
-  async ngOnInit() {
-    await this.storage.create();
-    const registro = await this.storage.get('usuario');
-    if (registro) {
-      this.usuario = Object.assign(new Usuario(), registro);
-      this.carregarProjetos();
-    } else {
-      this.navCtrl.navigateRoot('/login');
-    }
-  }
+  ngOnInit() {
+    this.route.queryParams.subscribe(params => {
+      this.projetoId = params['projetoId'];
+      this.tarefaId = params['tarefaId'];
 
-  async carregarProjetos() {
-    const options: HttpOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${this.usuario.token}`
-      },
-      url: 'http://127.0.0.1:8000/projeto/api/listar/'
-    };
-
-    try {
-      const resposta = await CapacitorHttp.get(options);
-      if (resposta.status == 200) {
-        this.lista_projetos = resposta.data;
+      if (this.tarefaId) {
+        this.editando = true;
+        this.carregarTarefa();
+      } else {
+        this.tarefa.projeto = this.projetoId;
       }
-    } catch (e) {
-      console.error(e);
-    }
+    });
   }
 
-  async salvar() {
-    if (!this.tarefa.titulo || !this.tarefa.projeto) {
-      this.apresenta_mensagem('Preencha título e projeto.');
-      return;
-    }
+  carregarTarefa() {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
+    const url = `${environment.apiUrl}/tarefa/api/editar/${this.tarefaId}/`;
 
-    const loading = await this.loadingCtrl.create({ message: 'Salvando...' });
-    await loading.present();
+    this.http.get<any>(url, { headers }).subscribe({
+      next: (dados) => {
+        this.tarefa = dados;
+      },
+      error: () => this.exibirToast('Erro ao carregar tarefa')
+    });
+  }
 
-    let url = 'http://127.0.0.1:8000/tarefa/api/cadastrar/';
-    let metodo = 'post';
+  salvar() {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
 
     if (this.editando) {
-      url = `http://127.0.0.1:8000/tarefa/api/editar/${this.tarefa.id}/`;
-      metodo = 'put';
-    }
-
-    const options: HttpOptions = {
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Token ${this.usuario.token}`
-      },
-      url: url,
-      data: this.tarefa
-    };
-
-    try {
-      const resposta = metodo === 'put' ? await CapacitorHttp.put(options) : await CapacitorHttp.post(options);
-      
-      loading.dismiss();
-      this.ngZone.run(() => {
-        if (resposta.status == 200 || resposta.status == 201) {
-          this.apresenta_mensagem('Salvo com sucesso!');
-          this.navCtrl.navigateBack('/tarefas');
-        } else {
-          this.apresenta_mensagem(`Erro ao salvar: ${resposta.status}`);
-        }
+      const url = `${environment.apiUrl}/tarefa/api/editar/${this.tarefaId}/`;
+      this.http.patch(url, this.tarefa, { headers }).subscribe({
+        next: () => this.finalizar('Tarefa atualizada!'),
+        error: () => this.exibirToast('Erro ao atualizar')
       });
-    } catch (error) {
-      loading.dismiss();
-      this.apresenta_mensagem('Erro na requisição.');
-      console.error(error);
+    } else {
+      const url = `${environment.apiUrl}/tarefa/api/cadastrar/`;
+      this.http.post(url, this.tarefa, { headers }).subscribe({
+        next: () => this.finalizar('Tarefa criada!'),
+        error: () => this.exibirToast('Erro ao criar')
+      });
     }
   }
 
-  async apresenta_mensagem(texto: string) {
-    const toast = await this.toastCtrl.create({ message: texto, duration: 2000 });
-    toast.present();
+  finalizar(msg: string) {
+    this.exibirToast(msg);
+    window.history.back(); 
+  }
+
+  async exibirToast(msg: string) {
+    const t = await this.toastCtrl.create({ message: msg, duration: 2000 });
+    t.present();
   }
 }

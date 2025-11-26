@@ -1,86 +1,61 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, LoadingController, NavController, ToastController } from '@ionic/angular';
-import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
-import { Storage } from '@ionic/storage-angular';
+import { IonicModule, ToastController } from '@ionic/angular';
+import { Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Usuario } from '../login/usuario.model';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-register',
   templateUrl: './register.page.html',
   styleUrls: ['./register.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule],
-  providers: [Storage]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HttpClientModule]
 })
 export class RegisterPage implements OnInit {
 
-  public usuario: Usuario = new Usuario();
+  usuario: Usuario = {
+    username: '',
+    password: '',
+    password_confirm: ''
+  };
 
   constructor(
-    public controle_carregamento: LoadingController,
-    public controle_navegacao: NavController,
-    public controle_toast: ToastController,
-    public storage: Storage
+    private http: HttpClient,
+    private router: Router,
+    private toastController: ToastController
   ) { }
 
-  async ngOnInit() {
-    await this.storage.create();
-  }
+  ngOnInit() {}
 
-  async registrarUsuario() {
-    const loading = await this.controle_carregamento.create({message: 'Criando conta...', duration: 15000});
-    await loading.present();
+  registrar() {
+    if (this.usuario.password !== this.usuario.password_confirm) {
+      this.exibirToast('As senhas não conferem!');
+      return;
+    }
 
-    const options: HttpOptions = {
-      headers: { 'Content-Type': 'application/json' },
-      url: 'http://127.0.0.1:8000/api/usuario/registrar/',
-      data: this.usuario
-    };
+    const url = `${environment.apiUrl}/usuario/api/registrar/`;
 
-    CapacitorHttp.post(options)
-      .then(async (resposta: HttpResponse) => {
-        if (resposta.status == 201) {
-          loading.dismiss();
-          
-          this.apresenta_mensagem('Conta criada com sucesso!', 'success');
-          
-          this.fazerLoginAutomatico();
-        } else {
-          loading.dismiss();
-          this.apresenta_mensagem(`Erro ao criar: ${resposta.status}`, 'danger');
-        }
-      })
-      .catch(async (erro: any) => {
-        console.log(erro);
-        loading.dismiss();
-        this.apresenta_mensagem('Falha na conexão', 'danger');
-      });
-  }
-
-  async fazerLoginAutomatico() {
-    const options: HttpOptions = {
-      headers: { 'Content-Type': 'application/json' },
-      url: 'http://127.0.0.1:8000/autenticacao-api/',
-      data: { username: this.usuario.username, password: this.usuario.password }
-    };
-
-    CapacitorHttp.post(options).then(async (res) => {
-        if(res.status == 200) {
-            this.usuario.token = res.data.token;
-            await this.storage.set('usuario', this.usuario);
-            this.controle_navegacao.navigateRoot('/projetos');
-        }
+    this.http.post(url, this.usuario).subscribe({
+      next: () => {
+        this.exibirToast('Conta criada com sucesso! Faça login.');
+        this.router.navigate(['/login']);
+      },
+      error: (erro) => {
+        console.error(erro);
+        this.exibirToast('Erro ao criar conta. Tente outro usuário.');
+      }
     });
   }
 
-  async apresenta_mensagem(texto: string, cor: string) {
-    const mensagem = await this.controle_toast.create({
-      message: texto,
+  async exibirToast(mensagem: string) {
+    const toast = await this.toastController.create({
+      message: mensagem,
       duration: 2000,
-      color: cor
+      color: 'dark'
     });
-    mensagem.present();
+    toast.present();
   }
 }

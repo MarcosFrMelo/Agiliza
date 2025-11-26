@@ -1,55 +1,77 @@
-<ion-header [translucent]="true">
-  <ion-toolbar color="primary">
-    <ion-title>Meus Projetos</ion-title>
+<ion-header class="ion-no-border">
+  <ion-toolbar color="primary" style="--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+    <ion-title style="font-weight: 800;">Meus Projetos</ion-title>
     <ion-buttons slot="end">
+      <ion-button [routerLink]="['/projeto-cadastro']">
+        <ion-icon slot="icon-only" name="add-circle"></ion-icon>
+      </ion-button>
       <ion-button (click)="logout()">
-        <ion-icon name="log-out-outline" slot="icon-only"></ion-icon>
+        <ion-icon slot="icon-only" name="log-out-outline"></ion-icon>
       </ion-button>
     </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
+<ion-content [fullscreen]="true" style="--background: #f4f5f8;">
+  
+  <div class="ion-padding">
+    
+    <h2 style="font-weight: bold; color: #333; margin-bottom: 5px;">Olá!</h2>
+    <p style="color: #666; margin-top: 0;">Aqui estão seus quadros de trabalho.</p>
 
-  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
-    <ion-refresher-content></ion-refresher-content>
-  </ion-refresher>
-
-  <ion-list *ngIf="lista_projetos.length > 0">
-    <ion-item-sliding *ngFor="let projeto of lista_projetos">
+    <ion-list style="background: transparent;">
       
-      <ion-item lines="full" detail="true" button="true" (click)="abrirTarefas(projeto)">
-        <ion-thumbnail slot="start">
-          <div *ngIf="!projeto.imagem_capa" style="width: 100%; height: 100%; background: #eee; display: flex; align-items: center; justify-content: center;">
-            <ion-icon name="folder-open-outline" style="font-size: 24px; color: #666;"></ion-icon>
-          </div>
-          <img *ngIf="projeto.imagem_capa" [src]="projeto.imagem_capa" />
-        </ion-thumbnail>
-        <ion-label>
-          <h2>{{ projeto.nome }}</h2>
-          <p>{{ projeto.descricao || 'Sem descrição' }}</p>
-        </ion-label>
-      </ion-item>
+      <ion-card *ngFor="let projeto of projetos" class="project-card" style="margin-inline: 0; margin-bottom: 20px; border-radius: 15px; box-shadow: 0 4px 12px rgba(0,0,0,0.08);">
+        
+        <div style="height: 140px; background: #e9ecef; display: flex; align-items: center; justify-content: center; overflow: hidden; position: relative;">
+            
+            <img [src]="projeto.imagem_capa" 
+                 style="width: 100%; height: 100%; object-fit: cover;" 
+                 *ngIf="projeto.imagem_capa; else placeholder">
+            
+            <ng-template #placeholder>
+              <div style="display: flex; flex-direction: column; align-items: center; color: #cbd5e0;">
+                <ion-icon name="image-outline" style="font-size: 40px;"></ion-icon>
+                <span style="font-size: 12px; margin-top: 5px;">Sem capa</span>
+              </div>
+            </ng-template>
+            
+            <ion-fab vertical="top" horizontal="end" edge slot="fixed" style="margin-top: 10px; margin-right: 10px;">
+               <ion-fab-button size="small" color="light" style="--box-shadow: 0 2px 5px rgba(0,0,0,0.2);" (click)="$event.stopPropagation(); presentActionSheet(projeto)">
+                 <ion-icon name="ellipsis-vertical" color="dark"></ion-icon>
+               </ion-fab-button>
+            </ion-fab>
+        </div>
 
-      <ion-item-options side="end">
-        <ion-item-option color="warning" (click)="editar(projeto)">
-          <ion-icon name="pencil-outline" slot="icon-only"></ion-icon>
-        </ion-item-option>
-        <ion-item-option color="danger" (click)="confirmarExclusao(projeto.id)">
-          <ion-icon name="trash-outline" slot="icon-only"></ion-icon>
-        </ion-item-option>
-      </ion-item-options>
+        <ion-card-header>
+          <ion-card-title style="font-size: 1.2rem; font-weight: bold;">{{ projeto.nome }}</ion-card-title>
+        </ion-card-header>
 
-    </ion-item-sliding>
-  </ion-list>
+        <ion-card-content>
+          <p style="color: #666; font-size: 0.9rem; min-height: 40px;">
+            {{ projeto.descricao || 'Sem descrição definida.' }}
+          </p>
+          
+          <ion-button expand="block" fill="outline" class="ion-margin-top" shape="round" [routerLink]="['/tarefas', projeto.id]">
+            Ver Quadro
+            <ion-icon slot="end" name="arrow-forward"></ion-icon>
+          </ion-button>
+        </ion-card-content>
 
-  <div *ngIf="lista_projetos.length === 0" class="ion-text-center ion-padding" style="margin-top: 50px;">
-    <ion-icon name="folder-open-outline" style="font-size: 64px; color: #ccc;"></ion-icon>
-    <p>Nenhum projeto encontrado.</p>
+      </ion-card>
+
+    </ion-list>
+
+    <div *ngIf="projetos.length === 0" class="ion-text-center ion-padding-top" style="margin-top: 50px;">
+      <ion-icon name="file-tray-outline" style="font-size: 60px; color: #ccc;"></ion-icon>
+      <h3 style="color: #999;">Nenhum projeto ainda</h3>
+      <ion-button fill="clear" [routerLink]="['/projeto-cadastro']">Criar o primeiro</ion-button>
+    </div>
+
   </div>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button (click)="novoProjeto()">
+    <ion-fab-button color="primary" [routerLink]="['/projeto-cadastro']">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>

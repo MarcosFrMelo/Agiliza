@@ -1,7 +1,8 @@
-export class Usuario {
-    id?: number;
-    username?: string;
-    email?: string;
-    password?: string;
-    token?: string;
+export interface Usuario {
+  id?: number;
+  username?: string;
+  password?: string;
+  password_confirm?: string;
+  email?: string;
+  token?: string;
 }

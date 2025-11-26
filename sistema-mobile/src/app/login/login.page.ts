@@ -1,77 +1,60 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { IonicModule, LoadingController, NavController, ToastController } from '@ionic/angular';
-import { CapacitorHttp, HttpOptions, HttpResponse } from '@capacitor/core';
-import { Storage } from '@ionic/storage-angular';
+import { IonicModule, ToastController } from '@ionic/angular';
+import { Router, RouterModule } from '@angular/router';
+import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Usuario } from './usuario.model';
-import { RouterLink } from '@angular/router';
+import { environment } from 'src/environments/environment';
 
 @Component({
   selector: 'app-login',
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
   standalone: true,
-  imports: [IonicModule, CommonModule, FormsModule, RouterLink],
-  providers: [Storage]
+  imports: [IonicModule, CommonModule, FormsModule, RouterModule, HttpClientModule]
 })
 export class LoginPage implements OnInit {
-  
-  public instancia: Usuario = new Usuario();
+
+  usuario: Usuario = {
+    username: '',
+    password: ''
+  };
 
   constructor(
-    public controle_carregamento: LoadingController,
-    public controle_navegacao: NavController,
-    public controle_toast: ToastController,
-    public storage: Storage
+    private http: HttpClient, 
+    private router: Router,
+    private toastController: ToastController
   ) { }
 
-  async ngOnInit() {
-    await this.storage.create();
-  }
+  ngOnInit() {}
 
-  async autenticarUsuario() {
-    const loading = await this.controle_carregamento.create({message: 'Autenticando...', duration: 15000});
-    await loading.present();
+  async logar() {
+    if (!this.usuario.username || !this.usuario.password) {
+      this.exibirToast('Preencha todos os campos');
+      return;
+    }
 
-    const options: HttpOptions = {
-      headers: { 'Content-Type': 'application/json' },
-      url: 'http://127.0.0.1:8000/autenticacao-api/',
-      data: {
-        username: this.instancia.username,
-        password: this.instancia.password
+    const url = `${environment.apiUrl}/autenticacao-api/`;
+
+    this.http.post<any>(url, this.usuario).subscribe({
+      next: (resposta) => {
+        localStorage.setItem('token', resposta.token);
+        this.router.navigate(['/projetos']);
+      },
+      error: (erro) => {
+        console.error(erro);
+        this.exibirToast('Usuário ou senha incorretos');
       }
-    };
-
-    CapacitorHttp.post(options)
-      .then(async (resposta: HttpResponse) => {
-        if(resposta.status == 200) {
-          let usuarioLogado = new Usuario();
-          usuarioLogado.username = this.instancia.username;
-          usuarioLogado.token = resposta.data.token;
-
-          await this.storage.set('usuario', usuarioLogado);
-          
-          loading.dismiss();
-          this.controle_navegacao.navigateRoot('/projetos');
-        } else {
-          loading.dismiss();
-          this.apresenta_mensagem(`Erro: ${resposta.status}`);
-        }
-      })
-      .catch(async (erro: any) => {
-        console.log(erro);
-        loading.dismiss();
-        this.apresenta_mensagem('Falha na conexão');
-      });
+    });
   }
 
-  async apresenta_mensagem(texto: string) {
-    const mensagem = await this.controle_toast.create({
-      message: texto,
+  async exibirToast(mensagem: string) {
+    const toast = await this.toastController.create({
+      message: mensagem,
       duration: 2000,
-      color: 'danger'
+      position: 'bottom'
     });
-    mensagem.present();
+    toast.present();
   }
 }

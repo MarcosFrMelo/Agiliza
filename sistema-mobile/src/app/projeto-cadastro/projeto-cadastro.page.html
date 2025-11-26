@@ -1,37 +1,37 @@
-<ion-header>
-  <ion-toolbar color="primary">
+<ion-header [translucent]="true">
+  <ion-toolbar color="primary" style="--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/projetos"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ titulo }}</ion-title>
+    <ion-title>{{ editando ? 'Editar Projeto' : 'Novo Projeto' }}</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content class="ion-padding">
-  <ion-list>
-    
-    <ion-item class="ion-margin-bottom">
-      <ion-label position="stacked">Nome do Projeto</ion-label>
-      <ion-input [(ngModel)]="projeto.nome" placeholder="Ex: TCC"></ion-input>
-    </ion-item>
-
-    <ion-item class="ion-margin-bottom">
-      <ion-label position="stacked">Descrição</ion-label>
-      <ion-textarea [(ngModel)]="projeto.descricao" rows="4" placeholder="Detalhes do projeto..."></ion-textarea>
-    </ion-item>
-
-    <ion-item class="ion-margin-bottom">
-      <ion-label position="stacked">Imagem da Capa</ion-label>
-      <input type="file" (change)="onFileSelected($event)" style="margin-top: 10px;" />
-    </ion-item>
-
-  </ion-list>
-
-  <ion-button expand="block" (click)="salvar()" class="ion-margin-top" color="primary">
-    {{ botaoTexto }}
-  </ion-button>
+<ion-content [fullscreen]="true" class="ion-padding">
   
-  <ion-button expand="block" fill="clear" (click)="cancelar()" color="medium">
-    Cancelar
-  </ion-button>
+  <form (ngSubmit)="salvar()">
+    
+    <ion-item lines="full" class="ion-margin-bottom input-custom">
+      <ion-label position="stacked">Nome do Projeto</ion-label>
+      <ion-input [(ngModel)]="projeto.nome" name="nome" type="text" required></ion-input>
+    </ion-item>
+
+    <ion-item lines="full" class="ion-margin-bottom input-custom">
+      <ion-label position="stacked">Descrição</ion-label>
+      <ion-textarea [(ngModel)]="projeto.descricao" name="descricao" rows="4"></ion-textarea>
+    </ion-item>
+
+    <div class="ion-margin-top">
+      <ion-label color="medium" class="ion-margin-bottom" style="display:block">Imagem de Capa</ion-label>
+      <input type="file" (change)="onFileSelected($event)" accept="image/*">
+    </div>
+
+    <div class="ion-margin-top">
+      <ion-button type="submit" expand="block" [color]="editando ? 'tertiary' : 'success'" shape="round">
+        {{ editando ? 'ATUALIZAR' : 'CRIAR PROJETO' }}
+      </ion-button>
+    </div>
+
+  </form>
+
 </ion-content>
