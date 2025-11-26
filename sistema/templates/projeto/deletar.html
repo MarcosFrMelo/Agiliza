@@ -1,34 +1,37 @@
 {% extends 'base.html' %}
+{% load static %}
 
-{% block titulo %}Excluir Projeto{% endblock %}
+{% block titulo %}Excluir Projeto - Agiliza{% endblock %}
 
 {% block conteudo %}
-<div class="container mt-5">
-    <div class="row justify-content-center">
-        <div class="col-md-6">
-            <div class="card border-danger shadow">
-                <div class="card-header bg-danger text-white">
-                    <h4 class="mb-0">Excluir Projeto</h4>
-                </div>
-                <div class="card-body text-center">
-                    <h5 class="card-title mt-3">Tem certeza?</h5>
-                    <p class="card-text lead">Você está prestes a excluir o projeto: <strong>{{ object.nome }}</strong></p>
-                    
-                    <div class="alert alert-warning">
-                        <i class="fa-solid fa-triangle-exclamation"></i>
-                        Atenção: Todas as tarefas associadas a este projeto também serão apagadas permanentemente.
-                    </div>
-                    
-                    <form action="" method="POST">
-                        {% csrf_token %}
-                        <div class="mt-4">
-                            <a href="{% url 'listar-projetos' %}" class="btn btn-secondary me-2">Cancelar</a>
-                            <button type="submit" class="btn btn-danger">Sim, Excluir Definitivamente</button>
-                        </div>
-                    </form>
-                </div>
+<div class="container py-5 d-flex justify-content-center align-items-center" style="min-height: 60vh;">
+    
+    <div class="card shadow-lg border-0 rounded-4 text-center" style="max-width: 450px;">
+        <div class="card-body p-5">
+            
+            <div class="mb-4 text-danger">
+                <svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" fill="currentColor" class="bi bi-exclamation-circle" viewBox="0 0 16 16">
+                    <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                </svg>
             </div>
+
+            <h3 class="fw-bold mb-3">Tem certeza?</h3>
+            
+            <p class="text-muted mb-4">
+                Você está prestes a excluir o projeto <strong>"{{ object.nome }}"</strong>. 
+                <br>Isso também apagará todas as tarefas vinculadas. <br>Essa ação não pode ser desfeita.
+            </p>
+
+            <form method="POST">
+                {% csrf_token %}
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-lg">Sim, Excluir Projeto</button>
+                    <a href="{% url 'listar-projetos' %}" class="btn btn-outline-secondary">Cancelar</a>
+                </div>
+            </form>
         </div>
     </div>
+
 </div>
 {% endblock %}
