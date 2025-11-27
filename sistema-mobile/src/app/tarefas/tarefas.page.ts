@@ -5,6 +5,8 @@ import { IonicModule, ActionSheetController, ToastController } from '@ionic/angu
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { addIcons } from 'ionicons';
+import { ellipsisVertical, add, checkmarkDoneCircleOutline, create, trash, close } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tarefas',
@@ -14,7 +16,6 @@ import { environment } from 'src/environments/environment';
   imports: [IonicModule, CommonModule, FormsModule, RouterModule, HttpClientModule]
 })
 export class TarefasPage implements OnInit {
-
   projetoId: string | null = null;
   tarefas: any[] = [];
   segmento = '1';
@@ -25,7 +26,9 @@ export class TarefasPage implements OnInit {
     private router: Router,
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController
-  ) { }
+  ) {
+    addIcons({ ellipsisVertical, add, checkmarkDoneCircleOutline, create, trash, close });
+  }
 
   ngOnInit() {
     this.projetoId = this.route.snapshot.paramMap.get('id');
@@ -56,7 +59,7 @@ export class TarefasPage implements OnInit {
       case 2: return 'warning';
       case 3: return 'primary';
       case 4: return 'medium';
-      case 5: return 'light'; 
+      case 5: return 'light';
       default: return 'medium';
     }
   }

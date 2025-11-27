@@ -5,6 +5,11 @@ import { IonicModule, ActionSheetController, ToastController } from '@ionic/angu
 import { Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { addIcons } from 'ionicons';
+import { 
+  addCircle, logOutOutline, folderOpen, ellipsisVertical, 
+  arrowForward, fileTrayOutline, add, imageOutline, create, trash, close 
+} from 'ionicons/icons';
 
 @Component({
   selector: 'app-projetos',
@@ -15,14 +20,19 @@ import { environment } from 'src/environments/environment';
 })
 export class ProjetosPage implements OnInit {
 
-  projetos: any[] = []; // Lista que o HTML espera
+  projetos: any[] = [];
 
   constructor(
     private http: HttpClient,
     private router: Router,
     private actionSheetCtrl: ActionSheetController,
     private toastCtrl: ToastController
-  ) { }
+  ) {
+    addIcons({ 
+      addCircle, logOutOutline, folderOpen, ellipsisVertical, 
+      arrowForward, fileTrayOutline, add, imageOutline, create, trash, close 
+    });
+  }
 
   ionViewWillEnter() {
     this.carregarProjetos();
@@ -41,14 +51,17 @@ export class ProjetosPage implements OnInit {
     const url = `${environment.apiUrl}/projeto/api/listar/`;
 
     this.http.get<any[]>(url, { headers }).subscribe({
-      next: (dados) => {
-        this.projetos = dados;
-      },
+      next: (dados) => { this.projetos = dados; },
       error: (erro) => {
         console.error(erro);
         if (erro.status === 401) this.logout();
       }
     });
+  }
+
+  abrirQuadro(projeto: any) {
+    console.log('Abrindo projeto:', projeto.id);
+    this.router.navigate(['/tarefas', projeto.id]);
   }
 
   async presentActionSheet(projeto: any) {
@@ -70,11 +83,7 @@ export class ProjetosPage implements OnInit {
             this.deletarProjeto(projeto.id);
           }
         },
-        {
-          text: 'Cancelar',
-          icon: 'close',
-          role: 'cancel'
-        }
+        { text: 'Cancelar', icon: 'close', role: 'cancel' }
       ]
     });
     await actionSheet.present();
