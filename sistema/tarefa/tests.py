@@ -40,7 +40,7 @@ class TestesViewQuadroTarefa(TestCase):
         self.tarefa_p1 = Tarefa.objects.create(titulo="Tarefa do P1", projeto=self.projeto1, status=1)
         self.projeto2 = Projeto.objects.create(nome="Outro Projeto", dono=self.user)
         self.tarefa_p2 = Tarefa.objects.create(titulo="Tarefa do P2", projeto=self.projeto2, status=1)    
-        self.url = reverse('quadro-projeto', kwargs={'projeto_id': self.projeto1.pk})
+        self.url = reverse('quadro-projeto', kwargs={'pk': self.projeto1.pk})
 
     def test_acesso_quadro(self):
         response = self.client.get(self.url)

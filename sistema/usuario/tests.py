@@ -49,8 +49,8 @@ class TestesAPIRegistro(APITestCase):
     def test_api_registro_sucesso(self):
         data = {
             'username': 'usuario_mobile',
-            'password1': 'SenhaForte@123',
-            'password2': 'SenhaForte@123'
+            'password': 'SenhaForte@123',
+            'password_confirm': 'SenhaForte@123'
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
@@ -59,8 +59,8 @@ class TestesAPIRegistro(APITestCase):
     def test_api_registro_senhas_diferentes(self):
         data = {
             'username': 'usuario_erro',
-            'password1': 'SenhaForte@123',
-            'password2': 'OutraSenha@123'
+            'password': 'SenhaForte@123',
+            'password_confirm': 'OutraSenha@123'
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
