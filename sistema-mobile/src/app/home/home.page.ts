@@ -1,7 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { addIcons } from 'ionicons';
 import { rocketOutline } from 'ionicons/icons';
 
@@ -13,7 +13,12 @@ import { rocketOutline } from 'ionicons/icons';
   imports: [IonicModule, CommonModule, RouterModule],
 })
 export class HomePage {
-  constructor() {
+  constructor(private router: Router) { 
     addIcons({ rocketOutline });
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    this.router.navigate(['/login']);
   }
 }

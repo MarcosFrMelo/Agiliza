@@ -1,7 +1,8 @@
 <ion-content class="bg-auth" [fullscreen]="true">
   <div class="center-content ion-text-center">
     
-    <div style="margin-bottom: 40px;"> <ion-icon name="rocket-outline" style="font-size: 90px; color: white; opacity: 0.9;"></ion-icon>
+    <div style="margin-bottom: 40px;">
+      <ion-icon name="rocket-outline" style="font-size: 90px; color: white; opacity: 0.9;"></ion-icon>
       <h1 style="color: white; font-weight: 900; margin-top: 15px; margin-bottom: 5px;">Agiliza</h1>
       <p style="color: rgba(255,255,255,0.8); font-size: 1.1rem;">Sua produtividade no máximo</p>
     </div>
@@ -16,8 +17,12 @@
         <ion-button expand="block" class="btn-primary" [routerLink]="['/projetos']">
           MEUS PROJETOS
         </ion-button>
+
+        <ion-button expand="block" fill="outline" class="ion-margin-top" [routerLink]="['/register']" style="--border-color: #667eea; color: #667eea; font-weight: bold; --border-radius: 50px; height: 50px;">
+          CRIAR CONTA
+        </ion-button>
         
-        <ion-button fill="clear" color="medium" [routerLink]="['/login']" class="ion-margin-top">
+        <ion-button fill="clear" color="medium" (click)="logout()" class="ion-margin-top" style="font-size: 0.9rem;">
           Sair da conta
         </ion-button>
       </ion-card-content>

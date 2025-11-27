@@ -3,11 +3,11 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/projetos"></ion-back-button>
     </ion-buttons>
-    <ion-title>Quadro de Tarefas</ion-title>
+    <ion-title style="font-weight: bold;">Quadro</ion-title>
   </ion-toolbar>
 
   <ion-toolbar color="light">
-    <ion-segment [(ngModel)]="segmento" mode="md">
+    <ion-segment [(ngModel)]="segmento" mode="md" scrollable>
       <ion-segment-button value="1">
         <ion-label>A Fazer</ion-label>
       </ion-segment-button>
@@ -23,33 +23,37 @@
 
 <ion-content [fullscreen]="true" style="--background: #f4f5f8;">
   
-  <ion-list style="background: transparent;" class="ion-padding-top">
+  <div style="min-height: 100%; display: flex; flex-direction: column;">
     
-    <ion-card *ngFor="let tarefa of tarefasFiltradas" style="border-radius: 12px; margin-inline: 16px; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
-      <ion-card-content>
-        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
-          <div>
-            <ion-badge [color]="getCorPrioridade(tarefa.etiqueta)" style="margin-bottom: 8px; font-weight: normal;">
-              {{ getNomePrioridade(tarefa.etiqueta) }}
-            </ion-badge>
-            
-            <h2 style="font-weight: bold; color: #333; font-size: 1.1rem;">{{ tarefa.titulo }}</h2>
-            <p style="color: #666; font-size: 0.9rem;">{{ tarefa.descricao }}</p>
+    <ion-list style="background: transparent;" class="ion-padding-top">
+      
+      <ion-card *ngFor="let tarefa of tarefasFiltradas" style="border-radius: 12px; margin-inline: 16px; margin-bottom: 16px; box-shadow: 0 4px 10px rgba(0,0,0,0.05);">
+        <ion-card-content style="padding: 15px;">
+          <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div style="flex: 1; padding-right: 10px;">
+              <ion-badge [color]="getCorPrioridade(tarefa.etiqueta)" style="margin-bottom: 8px; font-weight: normal; padding: 6px 10px; border-radius: 6px;">
+                {{ getNomePrioridade(tarefa.etiqueta) }}
+              </ion-badge>
+              
+              <h2 style="font-weight: bold; color: #333; font-size: 1.2rem; margin-top: 5px;">{{ tarefa.titulo }}</h2>
+              <p style="color: #666; font-size: 1rem; line-height: 1.4;">{{ tarefa.descricao }}</p>
+            </div>
+
+            <ion-button fill="clear" color="medium" (click)="abrirOpcoes(tarefa)" style="margin-top: -5px; margin-right: -10px;">
+              <ion-icon slot="icon-only" name="ellipsis-vertical" style="font-size: 1.5rem;"></ion-icon>
+            </ion-button>
           </div>
+        </ion-card-content>
+      </ion-card>
 
-          <ion-button fill="clear" size="small" color="medium" (click)="abrirOpcoes(tarefa)">
-            <ion-icon slot="icon-only" name="ellipsis-vertical"></ion-icon>
-          </ion-button>
-        </div>
-      </ion-card-content>
-    </ion-card>
+    </ion-list>
 
-    <div *ngIf="tarefasFiltradas.length === 0" class="ion-text-center ion-padding" style="margin-top: 40px; opacity: 0.5;">
-      <ion-icon name="checkmark-done-circle-outline" style="font-size: 60px;"></ion-icon>
-      <p>Nenhuma tarefa nesta coluna</p>
+    <div *ngIf="tarefasFiltradas.length === 0" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.5; min-height: 50vh;">
+      <ion-icon name="checkmark-done-circle-outline" style="font-size: 80px; margin-bottom: 15px;"></ion-icon>
+      <p style="font-size: 1.2rem;">Nenhuma tarefa nesta coluna</p>
     </div>
 
-  </ion-list>
+  </div>
 
   <ion-fab vertical="bottom" horizontal="end" slot="fixed">
     <ion-fab-button color="primary" (click)="novaTarefa()">

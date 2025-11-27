@@ -5,6 +5,8 @@ import { IonicModule, ToastController } from '@ionic/angular';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { HttpClient, HttpHeaders, HttpClientModule } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { addIcons } from 'ionicons';
+import { arrowBack } from 'ionicons/icons';
 
 @Component({
   selector: 'app-tarefa-cadastro',
@@ -22,7 +24,6 @@ export class TarefaCadastroPage implements OnInit {
     etiqueta: 3,
     projeto: null
   };
-
   projetoId: any = null;
   tarefaId: any = null;
   editando = false;
@@ -32,7 +33,9 @@ export class TarefaCadastroPage implements OnInit {
     private router: Router,
     private route: ActivatedRoute,
     private toastCtrl: ToastController
-  ) { }
+  ) { 
+    addIcons({ arrowBack });
+  }
 
   ngOnInit() {
     this.route.queryParams.subscribe(params => {
@@ -48,6 +51,16 @@ export class TarefaCadastroPage implements OnInit {
     });
   }
 
+  voltar() {
+    if (this.projetoId) {
+        this.router.navigate(['/tarefas', this.projetoId]);
+    } else if (this.tarefa.projeto) {
+        this.router.navigate(['/tarefas', this.tarefa.projeto]);
+    } else {
+        window.history.back();
+    }
+  }
+
   carregarTarefa() {
     const token = localStorage.getItem('token');
     const headers = new HttpHeaders({ 'Authorization': 'Token ' + token });
@@ -56,6 +69,7 @@ export class TarefaCadastroPage implements OnInit {
     this.http.get<any>(url, { headers }).subscribe({
       next: (dados) => {
         this.tarefa = dados;
+        this.projetoId = dados.projeto; 
       },
       error: () => this.exibirToast('Erro ao carregar tarefa')
     });
@@ -82,7 +96,7 @@ export class TarefaCadastroPage implements OnInit {
 
   finalizar(msg: string) {
     this.exibirToast(msg);
-    window.history.back(); 
+    this.voltar();
   }
 
   async exibirToast(msg: string) {

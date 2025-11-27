@@ -14,10 +14,12 @@
 
 <ion-content [fullscreen]="true" style="--background: #f4f5f8;">
   
-  <div class="ion-padding">
+  <div class="ion-padding" style="min-height: 100%; display: flex; flex-direction: column;">
     
-    <h2 style="font-weight: bold; color: #333; margin-bottom: 5px;">Olá!</h2>
-    <p style="color: #666; margin-top: 0;">Aqui estão seus quadros de trabalho.</p>
+    <div *ngIf="projetos.length > 0">
+      <h2 style="font-weight: bold; color: #333; margin-bottom: 5px;">Olá!</h2>
+      <p style="color: #666; margin-top: 0; margin-bottom: 20px;">Aqui estão seus quadros de trabalho.</p>
+    </div>
 
     <ion-list style="background: transparent;">
       
@@ -35,23 +37,23 @@
               </div>
             </ng-template>
             
-            <ion-fab vertical="top" horizontal="end" edge slot="fixed" style="margin-top: 10px; margin-right: 10px;">
-               <ion-fab-button size="small" color="light" style="--box-shadow: 0 2px 5px rgba(0,0,0,0.2);" (click)="$event.stopPropagation(); presentActionSheet(projeto)">
+            <ion-fab vertical="top" horizontal="end" edge slot="fixed" style="top: 15px; right: 15px;">
+               <ion-fab-button size="small" color="light" style="--box-shadow: 0 2px 5px rgba(0,0,0,0.3);" (click)="$event.stopPropagation(); presentActionSheet(projeto)">
                  <ion-icon name="ellipsis-vertical" color="dark"></ion-icon>
                </ion-fab-button>
             </ion-fab>
         </div>
 
         <ion-card-header>
-          <ion-card-title style="font-size: 1.2rem; font-weight: bold;">{{ projeto.nome }}</ion-card-title>
+          <ion-card-title style="font-size: 1.3rem; font-weight: 800;">{{ projeto.nome }}</ion-card-title>
         </ion-card-header>
 
         <ion-card-content>
-          <p style="color: #666; font-size: 0.9rem; min-height: 40px; margin-bottom: 15px;">
+          <p style="color: #666; font-size: 1rem; min-height: 40px; margin-bottom: 15px;">
             {{ projeto.descricao || 'Sem descrição definida.' }}
           </p>
           
-          <ion-button expand="block" fill="outline" shape="round" (click)="abrirQuadro(projeto)">
+          <ion-button expand="block" fill="outline" shape="round" (click)="abrirQuadro(projeto)" style="height: 50px; font-weight: bold;">
             Ver Quadro
             <ion-icon slot="end" name="arrow-forward"></ion-icon>
           </ion-button>
@@ -61,10 +63,10 @@
 
     </ion-list>
 
-    <div *ngIf="projetos.length === 0" class="ion-text-center ion-padding-top" style="margin-top: 50px;">
-      <ion-icon name="file-tray-outline" style="font-size: 60px; color: #ccc;"></ion-icon>
-      <h3 style="color: #999;">Nenhum projeto ainda</h3>
-      <ion-button fill="clear" [routerLink]="['/projeto-cadastro']">Criar o primeiro</ion-button>
+    <div *ngIf="projetos.length === 0" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0.6; min-height: 60vh;">
+      <ion-icon name="file-tray-outline" style="font-size: 80px; color: #ccc; margin-bottom: 20px;"></ion-icon>
+      <h3 style="color: #666; font-weight: bold;">Nenhum projeto ainda</h3>
+      <ion-button fill="clear" size="large" [routerLink]="['/projeto-cadastro']">Criar o primeiro</ion-button>
     </div>
 
   </div>

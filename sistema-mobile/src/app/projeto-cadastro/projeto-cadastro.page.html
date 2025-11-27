@@ -3,31 +3,37 @@
     <ion-buttons slot="start">
       <ion-back-button defaultHref="/projetos"></ion-back-button>
     </ion-buttons>
-    <ion-title>{{ editando ? 'Editar Projeto' : 'Novo Projeto' }}</ion-title>
+    <ion-title style="font-weight: bold; font-size: 1.2rem;">
+      {{ editando ? 'Editar Projeto' : 'Novo Projeto' }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   
-  <form (ngSubmit)="salvar()">
+  <form (ngSubmit)="salvar()" style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px;">
     
-    <ion-item lines="full" class="ion-margin-bottom input-custom">
-      <ion-label position="stacked">Nome do Projeto</ion-label>
-      <ion-input [(ngModel)]="projeto.nome" name="nome" type="text" required></ion-input>
+    <ion-item lines="full" class="input-large">
+      <ion-label position="stacked" style="font-size: 1.1rem; color: #555; margin-bottom: 10px;">Nome do Projeto</ion-label>
+      <ion-input [(ngModel)]="projeto.nome" name="nome" type="text" required 
+                 style="font-size: 1.3rem; padding-top: 10px; padding-bottom: 10px;"></ion-input>
     </ion-item>
 
-    <ion-item lines="full" class="ion-margin-bottom input-custom">
-      <ion-label position="stacked">Descrição</ion-label>
-      <ion-textarea [(ngModel)]="projeto.descricao" name="descricao" rows="4"></ion-textarea>
+    <ion-item lines="full" class="input-large">
+      <ion-label position="stacked" style="font-size: 1.1rem; color: #555; margin-bottom: 10px;">Descrição</ion-label>
+      <ion-textarea [(ngModel)]="projeto.descricao" name="descricao" rows="6" 
+                    style="font-size: 1.2rem; line-height: 1.5;"></ion-textarea>
     </ion-item>
 
-    <div class="ion-margin-top">
-      <ion-label color="medium" class="ion-margin-bottom" style="display:block">Imagem de Capa</ion-label>
-      <input type="file" (change)="onFileSelected($event)" accept="image/*">
+    <div class="ion-padding-horizontal">
+      <ion-label style="font-size: 1.1rem; color: #555; display:block; margin-bottom: 15px;">Imagem de Capa</ion-label>
+      <div style="border: 2px dashed #ccc; border-radius: 15px; padding: 20px; text-align: center; background: #fafafa;">
+        <input type="file" (change)="onFileSelected($event)" accept="image/*" style="width: 100%;">
+      </div>
     </div>
 
-    <div class="ion-margin-top">
-      <ion-button type="submit" expand="block" [color]="editando ? 'tertiary' : 'success'" shape="round">
+    <div style="margin-top: 30px;">
+      <ion-button type="submit" expand="block" [color]="editando ? 'tertiary' : 'success'" shape="round" style="height: 55px; font-size: 1.1rem; font-weight: bold; --box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
         {{ editando ? 'ATUALIZAR' : 'CRIAR PROJETO' }}
       </ion-button>
     </div>

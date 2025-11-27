@@ -1,38 +1,42 @@
 <ion-header [translucent]="true">
   <ion-toolbar color="primary" style="--background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
     <ion-buttons slot="start">
-      <ion-back-button></ion-back-button>
+      <ion-button (click)="voltar()">
+        <ion-icon slot="icon-only" name="arrow-back"></ion-icon>
+      </ion-button>
     </ion-buttons>
-    <ion-title>{{ editando ? 'Editar Tarefa' : 'Nova Tarefa' }}</ion-title>
+    <ion-title style="font-weight: bold;">
+      {{ editando ? 'Editar Tarefa' : 'Nova Tarefa' }}
+    </ion-title>
   </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true" class="ion-padding">
   
-  <form (ngSubmit)="salvar()">
+  <form (ngSubmit)="salvar()" style="display: flex; flex-direction: column; gap: 20px; margin-top: 20px;">
     
-    <ion-item lines="full" class="ion-margin-bottom input-custom">
-      <ion-label position="stacked">Título</ion-label>
-      <ion-input [(ngModel)]="tarefa.titulo" name="titulo" type="text" required></ion-input>
+    <ion-item lines="full">
+      <ion-label position="stacked" style="font-size: 1.1rem; color: #555; margin-bottom: 8px;">Título</ion-label>
+      <ion-input [(ngModel)]="tarefa.titulo" name="titulo" type="text" required style="font-size: 1.2rem;"></ion-input>
     </ion-item>
 
-    <ion-item lines="full" class="ion-margin-bottom input-custom">
-      <ion-label position="stacked">Descrição</ion-label>
-      <ion-textarea [(ngModel)]="tarefa.descricao" name="descricao" rows="3"></ion-textarea>
+    <ion-item lines="full">
+      <ion-label position="stacked" style="font-size: 1.1rem; color: #555; margin-bottom: 8px;">Descrição</ion-label>
+      <ion-textarea [(ngModel)]="tarefa.descricao" name="descricao" rows="4" style="font-size: 1.2rem;"></ion-textarea>
     </ion-item>
 
-    <ion-item lines="full" class="ion-margin-bottom input-custom">
-      <ion-label position="stacked">Status</ion-label>
-      <ion-select [(ngModel)]="tarefa.status" name="status">
+    <ion-item lines="full">
+      <ion-label position="stacked" style="font-size: 1.1rem; color: #555;">Status</ion-label>
+      <ion-select [(ngModel)]="tarefa.status" name="status" style="font-size: 1.1rem; padding-top: 10px;">
         <ion-select-option [value]="1">A Fazer</ion-select-option>
         <ion-select-option [value]="2">Fazendo</ion-select-option>
         <ion-select-option [value]="3">Feito</ion-select-option>
       </ion-select>
     </ion-item>
 
-    <ion-item lines="full" class="ion-margin-bottom input-custom">
-      <ion-label position="stacked">Prioridade</ion-label>
-      <ion-select [(ngModel)]="tarefa.etiqueta" name="etiqueta">
+    <ion-item lines="full">
+      <ion-label position="stacked" style="font-size: 1.1rem; color: #555;">Prioridade</ion-label>
+      <ion-select [(ngModel)]="tarefa.etiqueta" name="etiqueta" style="font-size: 1.1rem; padding-top: 10px;">
         <ion-select-option [value]="1">Urgente</ion-select-option>
         <ion-select-option [value]="2">Importante</ion-select-option>
         <ion-select-option [value]="3">Normal</ion-select-option>
@@ -42,7 +46,7 @@
     </ion-item>
 
     <div class="ion-margin-top">
-      <ion-button type="submit" expand="block" class="btn-primary" shape="round">
+      <ion-button type="submit" expand="block" class="btn-primary" shape="round" style="height: 55px; font-size: 1.1rem; font-weight: bold;">
         {{ editando ? 'SALVAR ALTERAÇÕES' : 'ADICIONAR TAREFA' }}
       </ion-button>
     </div>
